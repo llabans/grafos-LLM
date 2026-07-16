@@ -139,5 +139,5 @@ def test_hall_witness_distinguishes_isolate_and_capacity_bottleneck() -> None:
     }
     capacity = next(item for item in witnesses if item.mechanism == "capacity_bottleneck")
     assert capacity.deficiency == 1
-    assert capacity.target_ids == ("v0", "v1")
-    assert capacity.neighboring_scenario_ids == ("u0",)
+    assert capacity.clinical_route_variant_ids == ("v0", "v1")
+    assert capacity.neighboring_case_structure_ids == ("u0",)

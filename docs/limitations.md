@@ -1,71 +1,94 @@
 # Limitaciones y amenazas a la validez
 
-## Alcance clínico
+## 1. Validez de constructo
 
-El proyecto no valida el contenido médico de la GPC ni traduce sus elementos en recomendaciones para personas. No incorpora historias clínicas, pacientes sintéticos, resultados, dosis, pronósticos ni priorización. Una compatibilidad es una relación de cobertura educativa, no una indicación clínica.
+La cardinalidad \(|M^*|\) mide capacidad de asignación uno-a-uno. No mide
+realismo, frecuencia de rutas, calidad clínica, utilidad ni privacidad.
 
-## Dependencia de fuente
+## 2. Dependencia de las aristas
 
-- Solo se autoriza `gpc-05-hipertension-embarazo-2025`.
-- La variante resumida está excluida porque su mapeo es `draft`.
-- Los archivos Phase 4 contienen múltiples guías; un error de filtro sería grave.
-- Los hashes de Phase 4 cubren el archivo multiguía completo: un cambio ajeno a la guía objetivo puede disparar drift conservador.
-- Los agregados no incluyen esquemas formales completos; algunos contratos son validaciones de runtime derivadas del snapshot inspeccionado.
-- No se versiona el ZIP, por lo que la reproducción por terceros exige acceso autorizado independiente.
+El solver puede ser perfecto y el resultado inútil si una compatibilidad es
+incorrecta. Cada arista necesita testigo reproducible y revisión clínica.
 
-## Modelado semántico
+## 3. Restricción unitaria
 
-- Las firmas son reglas locales versionadas porque `route_templates` está vacío.
-- El `AND` de `flow_1` se apoya en una advertencia textual de la fuente; no debe generalizarse a otras guías.
-- `flow_2:n9` se conserva como aislado y no como terminal alcanzable; otra finalidad documental podría tratarlo de modo distinto.
-- `flow_3` se excluye por ser metodológico.
-- La normalización convierte solo estructuras explícitas; puede omitir conceptos que requieran interpretación humana.
+Reservar una estructura para una sola ruta es una política KISS. Una estructura
+parametrizable podría generar varias rutas en una canalización real. La
+restricción hace visible la capacidad independiente, pero puede subestimar la
+capacidad reutilizable.
 
-## Constructo de cobertura
+## 4. Matching no ponderado
 
-“Cobertura” significa objetivo con representante único bajo la función de compatibilidad. La métrica no captura importancia relativa, dificultad, redundancia pedagógica ni posibilidad de que un escenario ilustre varios objetivos en la práctica. La restricción uno-a-uno crea competencia intencional; un modelo de *set cover* respondería otra pregunta.
+Todos los pares cuentan igual. El algoritmo no expresa prioridad, riesgo,
+prevalencia, costo ni calidad. Si esas diferencias importan, se requieren pesos
+o restricciones.
 
-No hay ponderación. Si los objetivos tuviesen prioridades justificadas, el problema sería asignación ponderada y exigiría otra formulación y evidencia.
+## 5. Una sola GPC
 
-## Correctitud algorítmica
+La factibilidad interna no demuestra transportabilidad a otras guías,
+especialidades, instituciones o versiones.
 
-La teoría sustenta el algoritmo y 689 grafos pequeños fueron verificados exhaustivamente, pero el software no está formalmente probado con un asistente de teoremas. Los tests no pueden demostrar ausencia absoluta de defectos. NetworkX reduce el riesgo de error correlacionado, sin eliminarlo.
+## 6. Fuente privada
 
-La función de testigos de Hall presupone un matching máximo; se usa después de concordancia entre dos solvers y oráculo.
+La demo pública usa IDs simbólicos. Sin el snapshot congelado no puede auditarse
+externamente cada texto y página, aunque la topología algorítmica sí sea
+reproducible.
 
-## Experimentos
+## 7. Rutas canónicas
 
-- Los tiempos son microbenchmarks de un entorno y fecha concretos.
-- Las 21 repeticiones comparten hardware, proceso e intérprete; no son observaciones independientes para inferencia estadística.
-- `tracemalloc` estima asignaciones Python, no memoria residente total.
-- El fixture escalera es adversarial para el DFS determinista y no representa una población de grafos.
-- El grafo GPC es pequeño; diferencias de microsegundos no justifican una conclusión práctica fuerte.
-- No se evaluó paralelización, otras implementaciones, lenguajes ni grandes colecciones de guías.
+La enumeración de variantes depende de decisiones sobre ciclos, equivalencias y
+terminales. Otra **canonical_signature** válida puede producir otro \(V\).
 
-## Validez externa
+## 8. Expresividad de las estructuras
 
-Los resultados numéricos no se transfieren a otra GPC, versión, país, idioma o pipeline de extracción. Adaptar el método requiere volver a ejecutar INSPECT, definir contratos, reconciliar semántica, versionar reglas y repetir todos los gates.
+Una estructura demasiado rígida pierde variantes; una demasiado flexible se vuelve
+compatible con casi todo y reduce el valor informativo del grafo. La
+granularidad debe justificarse.
 
-## Riesgo de interpretación
+## 9. Existencia no equivale a robustez
 
-Los términos médicos pueden hacer que el lector sobreinterprete el producto. Por ello todos los entregables reiteran:
+Una arista se acepta con al menos un testigo. Eso no indica qué proporción del
+dominio de la estructura recorre la ruta ni cuán estable es ante perturbaciones.
+Una extensión puede estimar robustez o volumen factible.
 
-- uso educativo y no clínico;
-- ausencia de pacientes;
-- ausencia de inferencia causal o predictiva;
-- “sin arista” como falta de soporte estructural, no como juicio médico;
-- 94,3 % como métrica combinatoria, no clínica.
+## 10. Hall no asigna causa clínica
 
-## Trabajo futuro permitido
+El déficit identifica un cuello combinatorio. Determinar si debe añadirse una
+estructura, eliminarse una variante o cambiarse la política es una decisión externa.
 
-Dentro del mismo alcance educativo podrían estudiarse:
+## 11. No hay datos sintéticos todavía
 
-- sensibilidad de `|M|` a versiones alternativas, explícitas y revisadas de compatibilidad;
-- matching ponderado con pesos no clínicos justificados, por ejemplo costo de construcción de una prueba;
-- comparación con *set cover* como problema distinto;
-- contratos JSON Schema oficiales;
-- property-based testing adicional;
-- prueba formal del solver;
-- benchmarks en familias sintéticas con diseño factorial de tamaño y densidad.
+No pueden evaluarse fidelidad estadística, diversidad, utilidad downstream ni
+privacidad. Cualquier afirmación sobre esas dimensiones sería prematura.
 
-Ninguna extensión debe convertir el proyecto en soporte de decisión clínica sin un proceso independiente de regulación, seguridad, evaluación clínica y gobernanza que está fuera de este curso.
+## 12. Evidencia bibliográfica
+
+La búsqueda fue dirigida y no registrada como revisión sistemática. El gap es
+una inferencia calibrada, no una prueba de originalidad mundial.
+
+## 13. Validez clínica pendiente
+
+La procedencia desde una GPC no garantiza que su extracción sea correcta ni que
+la guía sea aplicable fuera de su población y contexto. Se requiere panel
+independiente.
+
+## 14. Riesgo de automatización
+
+Un LLM puede ayudar a realizar texto futuro, pero no debe crear variables,
+alterar rutas o aprobar su propia salida sin controles externos.
+
+## 15. Cambios de versión
+
+Una nueva GPC puede modificar variantes y aristas. Los resultados son válidos solo
+para los hashes declarados y deben invalidarse ante drift.
+
+## Mitigaciones
+
+- versionado y hashes;
+- testigos positivos y negativos;
+- tres solvers;
+- panel clínico independiente;
+- reporte de todos los aislados y déficits;
+- lenguaje de inferencia limitado;
+- validación generativa separada;
+- réplica futura con otra GPC.

@@ -92,7 +92,7 @@ def main() -> None:
         "PASS "
         f"|U|={metrics['left_vertices']} |V|={metrics['right_vertices']} "
         f"|E|={metrics['edges']} |M|={metrics['matching_cardinality']} "
-        f"coverage={metrics['target_coverage_percent']:.2f}%"
+        f"route_variant_coverage={metrics['clinical_route_variant_coverage_percent']:.2f}%"
     )
 
 

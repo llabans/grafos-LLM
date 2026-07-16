@@ -1,251 +1,264 @@
 # Metodología
 
-## Goal y pregunta computacional
+## Diseño
 
-**Goal:** construir, verificar y comunicar una aplicación reproducible de emparejamiento máximo bipartito que asigne escenarios simbólicos, distintos y trazables al mayor número posible de obligaciones de cobertura derivadas de la GPC `gpc-05-hipertension-embarazo-2025`.
+Prueba de concepto algorítmico-estructural, reproducible y de una sola GPC. La
+unidad de análisis es una compatibilidad entre una entrada del catálogo de
+estructuras y una variante clínica de ruta. El estimando computacional es la cardinalidad del matching
+máximo del grafo fijado; no es un parámetro poblacional.
 
-La unidad de análisis no es una paciente. Es una entidad estructurada de prueba. La pregunta es:
+## GOAL
 
-> ¿Cuál es la máxima cardinalidad de una asignación uno-a-uno entre escenarios generados por reglas explícitas y obligaciones de cobertura respaldadas por la fuente?
+Construir el mayor **assignment_manifest.json** uno-a-uno de pares
+estructura-variante que puedan instanciarse de forma lógica y trazable antes de
+generar datos clínicos sintéticos.
 
-El proyecto no estima efectos, riesgos o probabilidades; no diagnostica ni recomienda conductas; no mide desempeño clínico.
+## LOOP
 
-## Diseño general
+    CONGELAR FUENTE
+        ↓
+    EXTRAER Y RECONCILIAR
+        ↓
+    CONSTRUIR VARIANTES DE RUTA
+        ↓
+    DEFINIR ESTRUCTURAS
+        ↓
+    DEMOSTRAR COMPATIBILIDADES
+        ↓
+    RESOLVER MATCHING
+        ↓
+    VERIFICAR Y VALIDAR
+        ↺
 
-Se usa un pipeline determinista con dos representaciones que no deben confundirse:
+Cada vuelta conserva versiones y no sobrescribe silenciosamente evidencia
+previa.
 
-1. El grafo dirigido `D=(N,A)` conserva la topología del flujograma: decisiones, ramas, acciones, alcanzabilidad y nodos aislados.
-2. El grafo bipartito `B=(U,V,E_B)` representa una relación de compatibilidad entre escenarios `U` y objetivos `V`.
+## 1. Congelamiento de la fuente
 
-```mermaid
-flowchart TD
-    A["Snapshot canónico + Phase 4"] --> B["Adaptación y hashes"]
-    B --> C["Reconciliación de D"]
-    C --> D["Firmas + criterios + crosswalk"]
-    D --> E["U: escenarios"]
-    D --> F["V: objetivos"]
-    E --> G["E_B: compatibilidad demostrable"]
-    F --> G
-    G --> H["DFS y Hopcroft–Karp"]
-    H --> I["Matching + testigos + métricas"]
-```
+Se fija una sola GPC mediante:
 
-Cada flecha es una transformación con contrato y gate. La salida de una etapa inválida no continúa.
+- identificador estable;
+- versión y fecha;
+- inventario de archivos;
+- hashes SHA-256;
+- secciones, páginas y unidades de conocimiento;
+- reglas de normalización.
 
-## Jerarquía de evidencia
+La demo pública emplea IDs simbólicos. La reconstrucción clínica exacta requiere
+el snapshot privado y superar sus verificaciones de hash.
 
-| Nivel | Fuente | Responsabilidad |
-|---|---|---|
-| 1 | `flowcharts.json`, `recommendations.json`, `tables.json`, `structure.json` | Autoridad primaria local para contenido y topología |
-| 2 | Phase 4 filtrada por `source_id` exacto | Representación derivada para reconciliar IDs y conteos |
-| 3 | Reglas versionadas del proyecto | Formalizar firmas, escenarios, objetivos y compatibilidad |
-| 4 | CLRS, cap. 25 y artículos primarios | Sustentar teoría y complejidad algorítmica |
-| 5 | Tests, oráculos y benchmarks | Evidencia de correctitud computacional y comportamiento local |
+## 2. Reconciliación de representaciones
 
-Una capa inferior no “corrige” silenciosamente a una superior. La fuente primaria decide la semántica local; Phase 4 no se ingiere como un segundo grafo clínico.
+La GPC estructurada incluye flujogramas primarios, grafos derivados, unidades
+clínicas y recomendaciones. Los flujogramas se tratan como autoridad para
+transiciones; las representaciones derivadas sirven para reconciliar IDs,
+inicios, terminales y procedencia. Una discrepancia activa un error de fuente,
+no una imputación.
 
-## Ingesta y control de fuente
+## 3. Grafo dirigido de decisión
 
-La raíz autorizada debe contener el snapshot exacto y `outputs/phase4`. Ocho archivos obligatorios se verifican mediante SHA-256. Los adaptadores de Phase 4 filtran antes de adaptar:
+Se construye \(D=(N,A)\), donde los nodos representan estados, condiciones,
+decisiones o acciones y las aristas representan transiciones autorizadas. Se
+verifica:
 
-```python
-row.get("source_id") == "gpc-05-hipertension-embarazo-2025"
-```
+- entrada y terminales definidos;
+- alcanzabilidad desde la entrada;
+- etiquetas de rama no ambiguas;
+- ausencia de referencias colgantes;
+- consistencia de predicados;
+- trazabilidad de cada nodo y transición.
 
-Esto excluye otras guías y la variante `gpc-05-hipertension-embarazo-resumida-2025`, cuyo mapa está en estado `draft`. También evita que el nombre `decision_graphs_filtered.jsonl` se tome como garantía de alcance.
+Este grafo dirigido modela la lógica clínica. No debe confundirse con el grafo
+bipartito de asignación.
 
-Los conteos de control son 5 recomendaciones/BPC, 221 tablas, 3 flujogramas, 30 segmentos, 269 unidades y 3 grafos Phase 4. Una diferencia de hash o conteo activa `SOURCE_DRIFT`.
+## 4. Variantes clínicas de ruta por representar
 
-## Reconciliación del grafo dirigido
+De \(D\) se enumeran variantes completas, canónicas, alcanzables y no
+redundantes:
 
-Para cada `flow_id` se comparan:
+    estado inicial
+        → condición
+        → decisión
+        → rama
+        → acción o terminal
 
-- conjunto de nodos y sus campos estructurales;
-- multiconjunto normalizado de aristas `(origen,destino,etiqueta)`;
-- página y sección;
-- nodo de inicio;
-- ausencia de `route_templates` materializados.
+Cada **ClinicalRouteVariant** registra:
 
-La reconciliación fue exacta: `flow_1` 6/5, `flow_2` 9/7 y `flow_3` 8/8 nodos/aristas. Los IDs locales se convierten en IDs compuestos (`flow_2:n4`) porque `n4` se repite entre flujos.
+- identificador;
+- estado de entrada;
+- predicados requeridos y prohibidos;
+- nodo de decisión y rama;
+- acción terminal;
+- unidades fuente y páginas;
+- estado de validación.
 
-### Semántica controlada
+La deduplicación se realiza mediante **canonical_signature**, que ignora el ID y
+usa la secuencia canónica de estados, predicados, ramas y terminal. No se usa
+parecido textual.
 
-- Las dos aristas `Sí` de `flow_1:n1` se modelan como activación `AND`, respaldada por la advertencia de la fuente.
-- Las ramas `Sí/No` y `Con/Sin criterios` de `flow_2` son `XOR`.
-- `flow_2:n9` se conserva como aislado informativo; no es terminal alcanzable ni origina una firma.
-- `flow_3` es metodológico y se audita, pero no participa en `U`, `V` o `E_B`.
+## 5. Estructuras de caso clínico
 
-## Firmas de ejecución
+Se construye un catálogo finito para el lote piloto. Cada entrada tiene
+capacidad uno en este matching y contiene:
 
-Una firma es una plantilla alcanzable y versionada:
+- variables clínicas autorizadas por la GPC;
+- tipos y dominios posibles;
+- restricciones obligatorias;
+- combinaciones prohibidas;
+- missingness permitido;
+- estado inicial;
+- procedencia;
+- estado de validación.
 
-\[
-\sigma=(G, O, P, A, R, S),
-\]
+Las estructuras se derivan del esquema de variables, dominios y restricciones,
+no de las variantes ya enumeradas. Así se evita fabricar una estructura a la
+medida de cada ruta y volver trivial el grafo.
 
-donde `G` es el grafo, `O` resultados de decisión, `P` predicados, `A` acciones activadas, `R` nodos alcanzados y `S` semántica de rama. Se definieron cinco firmas respaldadas por los dos flujos incluidos: riesgo no alcanzado, riesgo con ramas paralelas, presión no elevada, presión elevada sin criterios y presión elevada con criterio.
+En esta fase no se agregan nombres, edades de relleno, prosa, eventos no
+sustentados ni conocimiento clínico externo.
 
-## Construcción de `U`
+## 6. Oráculo de compatibilidad
 
-Los escenarios son simbólicos y no contienen narrativas clínicas libres. Su cardinalidad se deriva de reglas versionadas:
+Para cada par \((u,v)\), el oráculo busca un \(x\in\operatorname{Inst}(u)\) tal
+que \(\operatorname{Exec}_D(x)=v\). \(\operatorname{Exec}_D\) es parcial,
+determinista y recorre decisiones XOR: una asignación válida habilita exactamente
+una rama; missingness insuficiente o contradicción produce rechazo. La decisión
+debe ser:
 
-| Regla | Construcción | Conteo |
-|---|---|---:|
-| `risk_high_single:v1` | un factor explícito de riesgo alto | 10 |
-| `risk_moderate_pair_without_replacement:v1` | pares no ordenados de 11 factores moderados | `C(11,2)=55` |
-| `explicit_low_risk_profile:v1` | perfil leve explícito | 1 |
-| `flow_2_negative_branch:v1` | firma estructural negativa | 1 |
-| `flow_2_no_severity:v1` | firma sin criterio de severidad | 1 |
-| `one_explicit_severity_criterion:v1` | uno de siete criterios explícitos | 7 |
-| **Total** |  | **75** |
+- determinista;
+- reproducible;
+- explicable;
+- acompañada por **witness_assignment** positivo y persistido;
+- acompañada por código de rechazo cuando no existe testigo.
 
-No se usa muestreo aleatorio. Los pares moderados se generan sin reemplazo mediante combinaciones; por tanto, el resultado es reproducible y no duplica `(a,b)` como `(b,a)`.
+Los códigos de rechazo distinguen variable ausente, dominio insuficiente,
+predicado contradictorio, terminal inaccesible y procedencia incompleta.
 
-## Construcción de `V`
+## 7. Construcción de \(B=(U,V,E)\)
 
-Los objetivos se deduplican por identificador y concepto estructurado, no por similitud textual:
+Se valida que:
 
-| Familia | Conteo |
-|---|---:|
-| factores de riesgo alto | 10 |
-| factores de riesgo moderado | 11 |
-| criterios de severidad | 7 |
-| recomendaciones/BPC | 5 |
-| resultados estructurales de decisión | 2 |
-| **Total** | **35** |
+- \(U\cap V=\varnothing\);
+- cada arista tenga un extremo en cada partición;
+- no existan duplicados;
+- todos los IDs referidos existan;
+- cada arista tenga testigo y versión de regla;
+- los aislados se conserven, porque son resultados informativos.
 
-El perfil de riesgo leve genera un escenario de rama negativa, pero no un objetivo factorial independiente. Esta asimetría está declarada y evita atribuir una obligación no definida.
+## 8. Algoritmos de matching
 
-## Crosswalk y compatibilidad
+### Baseline por caminos aumentantes
 
-El crosswalk une conceptos mediante IDs explícitos de grafo, recomendación y criterio. No usa embeddings, similitud semántica ni conocimiento médico externo.
+Se inicia con \(M=\varnothing\). Mientras exista un camino
+\(M\)-aumentante \(P\), se reemplaza \(M\) por \(M\oplus P\). El Lema 25.1 de
+CLRS muestra que cada aumento incrementa la cardinalidad en uno, y el Corolario
+25.4 certifica que la ausencia de caminos aumentantes equivale a optimalidad.
 
-Para `u∈U` y `v∈V`:
+Con búsqueda lineal por aumento, el costo usado como referencia es
+\(O(|U||E|)\), incluido en \(O(|V_B||E|)\).
 
-\[
-c(u,v)=I(R_v\subseteq P_u)
-I(F_v\cap P_u=\varnothing)
-I(A_v\subseteq A_u)
-I(z_u=z_v=\text{validated})
-I(g_u=g^*)I(\rho_{uv}=1).
-\]
+### Hopcroft-Karp
 
-Se incluye `(u,v)` en `E_B` si y solo si `c(u,v)=1`. Cada decisión registra predicados satisfechos, faltantes, contradicciones, regla, versión, motivos de exclusión y fuentes. La recomendación `rec_3` carece de acción explícita reconciliable en los flujos; su crosswalk queda `human_review_required` y sus 75 pares posibles son rechazados.
+El algoritmo agrupa caminos aumentantes mínimos y disjuntos por vértices:
 
-La descomposición observable de aristas es:
+1. BFS construye capas de distancias alternantes;
+2. DFS recorre solo aristas admisibles en esas capas;
+3. la diferencia simétrica aumenta \(M\) por todos los caminos hallados;
+4. se repite hasta que no exista camino aumentante.
 
-\[
-|E_B|=10+110+7+130+1+7+2=267.
-\]
-
-Los sumandos corresponden a alto riesgo, moderado, severidad, dos recomendaciones con 65 escenarios compatibles cada una, BPC sin severidad, BPC con severidad y dos objetivos estructurales.
-
-## Problema de optimización
-
-Con variable binaria `x_uv`:
-
-\[
-\max \sum_{(u,v)\in E_B}x_{uv},
-\]
-
-sujeto a:
-
-\[
-\sum_{v:(u,v)\in E_B}x_{uv}\le1\quad\forall u\in U,
-\qquad
-\sum_{u:(u,v)\in E_B}x_{uv}\le1\quad\forall v\in V.
-\]
-
-Esto es matching máximo no ponderado. No es *set cover*: un escenario compatible con varios objetivos solo puede representar uno dentro de `M`. Tampoco es propensity-score matching, matrimonio estable ni asignación ponderada.
-
-## Algoritmos propios
-
-### Baseline por camino aumentante
-
-Se recorre cada vértice libre de `U` y se busca por DFS una secuencia alternante capaz de liberar un objetivo. Una reasignación exitosa aumenta `|M|` en uno. En el peor caso se realizan `|U|` búsquedas de costo `O(m)`, por lo que el tiempo es `O(|U|m)⊆O(nm)` y el espacio total `O(n+m)`.
-
-### Hopcroft–Karp
-
-Cada fase:
-
-1. BFS asigna distancias a vértices libres de `U` y determina la longitud mínima de los caminos aumentantes disponibles.
-2. DFS recorre únicamente aristas admisibles entre capas consecutivas.
-3. Se aumenta un conjunto de caminos más cortos disjuntos en la misma fase.
-
-CLRS demuestra `O(m√n)` bajo las condiciones del grafo activo. La implementación admite aislados explícitos, de modo que reporta `O(n+m√n)` como cota de ejecución completa y `O(n+m)` de espacio.
-
-NetworkX no participa en el demo principal: solo aporta una cardinalidad de oráculo en pruebas y benchmarks.
-
-## Certificados de objetivos no cubiertos
-
-Un objetivo libre no se interpreta solo por su grado. Desde cada objetivo libre se explora el digrafo alternante: aristas no emparejadas de `V` hacia `U` y aristas emparejadas de `U` hacia `V`. El conjunto alcanzado produce un testigo de Hall `S⊆V`:
+CLRS, capítulo 25, demuestra la cota:
 
 \[
-\delta(S)=|S|-|N(S)|>0.
+O(|E|\sqrt{|V_B|}).
 \]
 
-Se observaron dos componentes deficitarios:
+En la instancia KISS la ventaja temporal no es necesaria por tamaño, pero su
+implementación evidencia comprensión del algoritmo solicitado.
 
-1. **Brecha de evidencia:** `S={rec_3}`, `|S|=1`, `|N(S)|=0`.
-2. **Cuello de capacidad:** ocho objetivos —siete criterios de severidad y una BPC asociada— compiten por siete escenarios; `|S|=8`, `|N(S)|=7`.
+## 9. Certificados
 
-Como los déficits suman 2, ningún matching puede superar `35-2=33`. La implementación construye un matching de tamaño 33; esta cota superior y la solución factible forman un certificado directo de optimalidad para el demo.
+Se reportan:
 
-## Diseño de verificación
+- matching completo;
+- cardinalidad;
+- verificación de unicidad;
+- ausencia de caminos aumentantes;
+- acuerdo entre baseline, Hopcroft-Karp y un oráculo independiente;
+- conjunto de Hall cuando existe déficit.
 
-La verificación usa evidencia complementaria:
+Para la demo, \(S=V\) tiene ocho rutas y siete estructuras vecinas. El déficit
+es uno.
 
-- casos unitarios conocidos y entradas inválidas;
-- 689 grafos etiquetados exhaustivos con particiones de tamaño 0 a 3;
-- enumeración exacta del óptimo en cada grafo pequeño;
-- concordancia de cardinalidad entre DFS, Hopcroft–Karp y NetworkX;
-- invariantes de unicidad y pertenencia de aristas;
-- tests de procedencia y de aislamiento de dominio;
-- reconciliación exacta del snapshot;
-- repetición determinista del pipeline;
-- testigos de Hall para déficits observados.
+## 10. assignment_manifest.json
 
-No se exige que los tres métodos devuelvan los mismos pares, porque pueden existir múltiples matchings máximos.
+Cada par seleccionado se serializa en **assignment_manifest.json** con:
 
-## Protocolo experimental
+- estructura reservada;
+- ruta asignada;
+- witness_assignment persistido;
+- restricciones que deben permanecer invariantes;
+- fuente y hashes;
+- semilla de generación futura;
+- estado de revisión.
 
-Los tiempos son microbenchmarks descriptivos de pared:
+Una ruta libre también se registra. No se inventa una estructura para completar
+el conteo.
 
-- una ejecución de calentamiento;
-- 21 repeticiones;
-- mediana y cuartiles inclusivos;
-- fixtures sin aleatoriedad;
-- pico aproximado de asignaciones Python con `tracemalloc` en una ejecución separada;
-- cardinalidad verificada con NetworkX.
+## 11. Estrategia de verificación
 
-Se separan el grafo GPC y dos familias matemáticas. No se realizan pruebas de hipótesis sobre tiempos: las repeticiones no son muestras independientes de una población científica y el objetivo es ingeniería reproducible, no inferencia de hardware.
+1. pruebas unitarias de estructuras de datos;
+2. grafos límite: vacío, aislado, perfecto, múltiple y deficitario;
+3. enumeración exhaustiva de grafos pequeños;
+4. concordancia con un solver externo;
+5. prueba de permutación de IDs;
+6. repetibilidad del JSON;
+7. ejecución de cada testigo sobre \(D\);
+8. reconstrucción desde la fuente congelada cuando esté disponible.
 
-## LOOP de desarrollo y gates
+## 12. Complejidad del pipeline
 
-El trabajo sigue:
+Sea \(n=|U|+|V|\), \(m=|E|\) y \(C_{\mathrm{compat}}\) el costo máximo de
+evaluar un par. La cota de ingeniería es:
 
-```text
-INSPECT → PLAN → IMPLEMENT → VERIFY → EVIDENCE AUDIT → REVIEW → RECORD
-                           ↑                              |
-                           └──────── siguiente corte ────┘
-```
+\[
+T_{\mathrm{total}}=
+T_{\mathrm{routes}}+
+T_{\mathrm{structures}}+
+O(|U||V|C_{\mathrm{compat}})+
+O(n+m\sqrt n).
+\]
 
-Cada vuelta debe acercar el estado al Goal y cerrar un corte vertical. Un gate fallido bloquea el registro final: estructura, reconciliación, semántica, algoritmo, fuente, dominio, trazabilidad, responsabilidad, experimento, currículo, documentación o entrega.
+El último sumando incluye inicialización y Hopcroft-Karp; la parte dominante del
+solver es \(O(m\sqrt n)\). La construcción exhaustiva de compatibilidades puede
+dominar el tiempo total.
 
-## Reproducibilidad
+## 13. Análisis estadístico proporcionado
 
-Los resultados se regeneran con:
+La cardinalidad del matching es exacta y determinista para un grafo fijado; no
+corresponde calcular un intervalo de confianza. La incertidumbre aparece en las
+aristas clínicas y en los datos sintéticos posteriores.
 
-```bash
-export BIPARTITE_MINSA_SOURCE_ROOT=/ruta/a/integration_design_data
-python scripts/validate_sources.py --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-python -m bipartite_minsa.pipeline.run_matching \
-  --source-root "$BIPARTITE_MINSA_SOURCE_ROOT" \
-  --output-dir reports/runtime
-python scripts/run_benchmarks.py \
-  --source-root "$BIPARTITE_MINSA_SOURCE_ROOT" \
-  --output reports/benchmarks.json --repeats 21
-python scripts/validate_project.py --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-```
+Para la validación experta se reportarán acuerdo, I-CVI, S-CVI/Ave, kappa
+modificado cuando corresponda y todas las discordancias. Para la fase generativa
+se preespecificarán métricas de fidelidad lógica, distribución, diversidad y
+privacidad. No se realizarán pruebas de hipótesis sobre tiempos de ejecución con
+repeticiones no independientes.
 
-La fuente no se versiona. El manifiesto, hashes, reglas, código, pruebas y resultados agregados sí permiten detectar drift y reconstruir la transformación.
+## 14. Reproducibilidad
+
+El repositorio conserva código, pruebas, documentación, notebook, manifiestos y
+artefactos de exposición. Los resultados clínicamente identificables no se
+publican; se publica una demo simbólica con la misma topología.
+
+## 15. Criterio de finalización
+
+El proyecto se considera completo para el curso cuando:
+
+- la pregunta y las particiones son inequívocas;
+- las catorce aristas de la demo tienen testigos;
+- ambos algoritmos devuelven siete;
+- el déficit de Hall es reproducible;
+- el manifiesto no repite estructuras ni rutas;
+- los límites de validez se declaran;
+- teoría, análisis, aplicación, código, Colab, material y exposición cubren la
+  rúbrica.

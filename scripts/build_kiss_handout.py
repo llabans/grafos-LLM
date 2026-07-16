@@ -89,31 +89,31 @@ def _draw_graph(canvas: Canvas, x: float, y: float) -> None:
     for row_y in ys:
         canvas.line(left_x + 10, row_y, right_x - 12, row_y)
         canvas.line(left_x + 10, row_y, right_x - 12, ys[2])
-    for index, row_y in enumerate(ys, start=1):
+    for label, row_y in zip(("E1", "E2", "E7"), ys, strict=True):
         canvas.setFillColor(BLUE)
         canvas.circle(left_x, row_y, 10, fill=1, stroke=0)
         canvas.setFillColor(white)
         canvas.setFont(BOLD, 6.8)
-        canvas.drawCentredString(left_x, row_y - 2.5, f"C{index}")
+        canvas.drawCentredString(left_x, row_y - 2.5, label)
     for index, row_y in enumerate(ys[:2], start=1):
         canvas.setFillColor(ORANGE)
         canvas.roundRect(right_x - 12, row_y - 10, 24, 20, 4, fill=1, stroke=0)
         canvas.setFillColor(white)
-        canvas.drawCentredString(right_x, row_y - 2.5, f"O{index}")
+        canvas.drawCentredString(right_x, row_y - 2.5, f"V{index}")
     canvas.setFillColor(ORANGE)
     canvas.roundRect(right_x - 12, ys[2] - 10, 24, 20, 4, fill=1, stroke=0)
     canvas.setFillColor(white)
-    canvas.drawCentredString(right_x, ys[2] - 2.5, "BPC")
+    canvas.drawCentredString(right_x, ys[2] - 2.5, "V0")
     canvas.setFillColor(MUTED)
     canvas.setFont(REGULAR, 6.5)
-    canvas.drawString(x + 2, y - 5, "Esquema: cada Ci conecta con Oi y con O_BPC.")
+    canvas.drawString(x + 2, y - 5, "Cada Ei conecta con Vi y con la variante V0 sin severidad.")
 
 
 def build(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     width, height = A4
     canvas = Canvas(str(path), pagesize=A4)
-    canvas.setTitle("Siete casos, ocho objetivos - ficha KISS")
+    canvas.setTitle("Siete estructuras, ocho variantes - ficha KISS")
     canvas.setAuthor("Proyecto grafos-LLM")
 
     canvas.setFillColor(NAVY)
@@ -125,18 +125,18 @@ def build(path: Path) -> None:
     canvas.drawString(34, height - 31, "PROYECTO FINAL - MAESTRÍA EN INGENIERÍA ESTADÍSTICA")
     canvas.setFillColor(white)
     canvas.setFont(BOLD, 24)
-    canvas.drawString(34, height - 67, "Siete casos, ocho objetivos")
+    canvas.drawString(34, height - 67, "Siete estructuras, ocho variantes")
     canvas.setFillColor(HexColor("#D9E7FF"))
     canvas.setFont(REGULAR, 10.2)
     canvas.drawString(
-        35, height - 89, "Matching bipartito para auditar cobertura educativa derivada de una GPC"
+        35, height - 89, "Asignación bipartita previa a la generación de datos clínicos sintéticos"
     )
     canvas.setFillColor(ORANGE)
     canvas.setFont(BOLD, 8.7)
     canvas.drawString(
         35,
         height - 108,
-        "GOAL  Maximizar objetivos distintos con casos distintos - cero decisiones clínicas",
+        "GOAL  Maximizar variantes con estructuras distintas - salida: manifiesto de asignación",
     )
 
     margin = 34
@@ -144,8 +144,8 @@ def build(path: Path) -> None:
     gap = 8
     kpi_w = (width - 2 * margin - 3 * gap) / 4
     kpis = (
-        ("7", "casos |U|", BLUE),
-        ("8", "microobjetivos |V|", ORANGE),
+        ("7", "estructuras |U|", BLUE),
+        ("8", "variantes |V|", ORANGE),
         ("14", "aristas |E|", GREEN),
         ("7", "matching |M*|", BLUE),
     )
@@ -168,10 +168,10 @@ def build(path: Path) -> None:
     _card(canvas, left_x, 489, col_w, 106)
     _paragraph(
         canvas,
-        "<b>¿Cuál es el máximo número de microobjetivos derivados de una GPC que "
-        "puede asignarse uno a uno a casos simulados compatibles, usando cada caso "
-        "una sola vez?</b><br/><br/>La cantidad optimizada es el número de pares "
-        "caso-objetivo, no el número de casos disponibles.",
+        "<b>¿Cuál es el máximo número de variantes clínicas de una GPC congelada que "
+        "puede asignarse uno a uno a estructuras de caso compatibles de un lote piloto?</b>"
+        "<br/><br/>La salida es un manifiesto de pares estructura-variante. Todavía no "
+        "existen pacientes, valores completos ni narrativas.",
         left_x + 13,
         579,
         col_w - 26,
@@ -182,14 +182,14 @@ def build(path: Path) -> None:
     _card(canvas, left_x, 335, col_w, 104)
     _draw_graph(canvas, left_x + 13, 355)
 
-    _section_title(canvas, "Qué significa cubrir", left_x, 305)
+    _section_title(canvas, "Tres niveles separados", left_x, 305)
     _card(canvas, left_x, 192, col_w, 93)
     _paragraph(
         canvas,
-        "Un objetivo está <b>cubierto</b> cuando recibe un caso compatible como "
-        "representante principal. <b>Distintos</b> significa deduplicados: cada objetivo "
-        "se cuenta una vez.<br/><br/>No mide aprendizaje, exactitud clínica, seguridad, "
-        "adherencia ni beneficio en pacientes.",
+        "<b>1. Estructura:</b> variables, dominios y restricciones.<br/>"
+        "<b>2. Instancia:</b> valores concretos que ejecutan una variante.<br/>"
+        "<b>3. Caso narrado:</b> realización textual posterior.<br/><br/>"
+        "El proyecto termina en el manifiesto; no genera los niveles 2 y 3.",
         left_x + 13,
         269,
         col_w - 26,
@@ -206,27 +206,26 @@ def build(path: Path) -> None:
     canvas.setFillColor(ORANGE)
     canvas.roundRect(right_x + 132, 547, 110, 30, 5, fill=1, stroke=0)
     canvas.setFillColor(white)
-    canvas.drawCentredString(right_x + 187, 559, "solo 7 casos")
+    canvas.drawCentredString(right_x + 187, 559, "solo 7 estructuras")
     _paragraph(
         canvas,
         "Cota inferior: <b>|M*| &gt;= 7</b>. Cota superior: <b>|M*| &lt;= 7</b>. "
-        "Luego, <b>|M*| = 7</b>.<br/><br/>Hall: para los ocho objetivos, "
-        "<b>|S| = 8 &gt; |N(S)| = 7</b>; déficit estructural = 1.",
+        "Luego, <b>|M*| = 7</b>.<br/><br/>Hall: ocho variantes compiten por siete "
+        "estructuras vecinas: <b>|S| = 8 &gt; |N(S)| = 7</b>; déficit = 1.",
         right_x + 13,
         540,
         col_w - 26,
         size=7.6,
     )
 
-    _section_title(canvas, "Aporte científico calibrado", right_x, 459, ORANGE)
+    _section_title(canvas, "Arista con testigo", right_x, 459, ORANGE)
     _card(canvas, right_x, 335, col_w, 104)
     _paragraph(
         canvas,
-        "La literatura respalda por separado GPC computables, generación de "
-        "pacientes o viñetas, blueprints curriculares y optimización de bancos. "
-        "La búsqueda dirigida no identificó la integración exacta "
-        "<b>GPC - casos - objetivos - matching - Hall</b>.<br/><br/>Se presenta como "
-        "prueba de concepto metodológica potencialmente novedosa, no como prioridad mundial.",
+        "Existe <b>(u,v) en E</b> si puede exhibirse una asignación "
+        "<b>x en Inst(u)</b> tal que <b>Exec(D,x)=v</b> y la procedencia puede "
+        "reconstruirse.<br/><br/>Cada arista conserva <b>w_uv=x</b>. La compatibilidad "
+        "no se aprueba por similitud semántica ni por ausencia de información.",
         right_x + 13,
         423,
         col_w - 26,
@@ -237,12 +236,12 @@ def build(path: Path) -> None:
     _card(canvas, right_x, 192, col_w, 93)
     _paragraph(
         canvas,
-        "<font color='#3D8DFF'><b>Demostrado:</b></font> algoritmo, cardinalidad y Hall.<br/>"
-        "<font color='#F59E42'><b>Fundamentado:</b></font> componentes y transferencia "
-        "metodológica.<br/>"
-        "<font color='#0E9F6E'><b>Pendiente:</b></font> revisión clínica independiente, "
-        "I-CVI/S-CVI, "
-        "adjudicación y piloto educativo.",
+        "<font color='#3D8DFF'><b>Demostrado:</b></font> matching, cardinalidad, "
+        "testigos y Hall.<br/>"
+        "<font color='#F59E42'><b>Fundamentado:</b></font> GPC computables, grafos de "
+        "decisión y simulación por estados.<br/>"
+        "<font color='#0E9F6E'><b>Pendiente:</b></font> revisión clínica experta y validez "
+        "generativa, temporal y estadística.",
         right_x + 13,
         268,
         col_w - 26,
@@ -252,10 +251,10 @@ def build(path: Path) -> None:
     _card(canvas, margin, 69, width - 2 * margin, 101)
     _paragraph(
         canvas,
-        "<b>LOOP:</b> DEFINIR - CONSTRUIR - RESOLVER - VERIFICAR - INTERPRETAR - REPETIR<br/>"
-        "<b>Decisión:</b> añadir un octavo caso compatible o permitir cobertura múltiple y "
-        "cambiar de modelo. Si un caso acredita varios objetivos, usar maximum coverage, "
-        "set cover, b-matching o MILP.",
+        "<b>LOOP:</b> CONGELAR GPC - DERIVAR D Y V - CONSTRUIR U - TESTEAR E - "
+        "RESOLVER - VERIFICAR - EMITIR MANIFIESTO<br/>"
+        "<b>Decisión:</b> añadir un cupo estructural o aceptar la variante no asignada. "
+        "Set cover queda como etapa posterior si se permite reutilizar tipos de estructura.",
         margin + 14,
         154,
         width - 2 * margin - 28,
@@ -266,8 +265,8 @@ def build(path: Path) -> None:
     _paragraph(
         canvas,
         "<b>Fuentes:</b> CLRS, 4.ª ed., cap. 25; Hopcroft y Karp (1973), DOI 10.1137/0202019; "
-        "Peleg et al. (2003); Boxwala et al. (2004); Walonoski et al. (2018); Mayer et al. "
-        "(2022); Polit, Beck y Owen (2007). Revisión completa: docs/literature_review.md.",
+        "Peleg et al. (2003); Boxwala et al. (2004); Walonoski et al. (2018); "
+        "Zhang et al. (2020); CPGPrompt (2026). Revisión: docs/literature_review.md.",
         margin + 14,
         103,
         width - 2 * margin - 28,
@@ -280,7 +279,7 @@ def build(path: Path) -> None:
     canvas.setFillColor(white)
     canvas.setFont(BOLD, 8.8)
     canvas.drawCentredString(
-        width / 2, 25, "COBERTURA ASIGNABLE - NO VALIDEZ CLÍNICA - USO EDUCATIVO"
+        width / 2, 25, "ASIGNACIÓN PRE-GENERATIVA - NO PACIENTES - NO SOPORTE CLÍNICO"
     )
     canvas.setFillColor(HexColor("#C7D7ED"))
     canvas.setFont(REGULAR, 6.5)

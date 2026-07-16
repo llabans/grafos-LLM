@@ -1,39 +1,50 @@
-# Auditoría semántica de flujogramas
+# Auditoría semántica del grafo dirigido
 
-## `flow_1` - prevención
+## Propósito
 
-- Inicio reconciliado: `n1`.
-- Alcanzables: `n1,n2,n3,n4,n5,n6`.
-- Terminales alcanzables: `n2,n5,n6`.
-- Ciclos: ninguno.
-- Aislados: ninguno.
-- Semántica: `n1 --No--> n2` es una alternativa; las dos transiciones `Sí` hacia `n3` y `n4` forman una activación paralela `AND`; `n3->n5` y `n4->n6` son secuenciales.
-- Gate: una firma positiva debe contener ambas ramas sin imponer un orden clínico inexistente.
+Determinar qué subgrafo puede ejecutarse de forma parcial y determinista antes
+de construir variantes de ruta. El matching no corrige ambigüedades del grafo
+clínico.
 
-## `flow_2` - manejo inicial
+## flow_1
 
-- Inicio reconciliado: `n2`.
-- Alcanzables: `n1,n2,n3,n4,n5,n6,n7,n8`.
-- Aislado: `n9`.
-- Terminales clínico-estructurales alcanzables: `n1,n7,n8`.
-- Ciclos: ninguno.
-- Semántica: `n2` divide `Sí/No` como XOR; `n3->n4` es secuencial; `n4` divide `Sin criterios/Con criterios` como XOR.
-- Gate: `n9` no puede originar ni completar una firma de ejecución.
+- seis nodos y cinco aristas;
+- sin ciclos;
+- dos salidas positivas simultáneas documentadas como semántica AND;
+- útil para el pipeline completo, pero excluido de la demo KISS XOR.
 
-## `flow_3` - método de evidencia
+Tratar esas salidas como alternativas eliminaría una acción sustentada.
 
-- Inicio reconciliado: `n1`.
-- Alcanzables: los ocho nodos.
-- Terminales: `n4,n7,n8`.
-- Ciclos: ninguno.
-- Alcance: no clínico; se excluye de `U`, `V` y `E`.
+## flow_2
 
-## Estados
+- nueve nodos y siete aristas;
+- inicio reconciliado;
+- decisiones Sí/No y Con criterios/Sin criterios como XOR;
+- un nodo informativo aislado que no es terminal alcanzable;
+- sin ciclos en el subgrafo clínico.
 
-| Riesgo | Estado | Efecto |
-|---|---|---|
-| Paralelismo `flow_1` | Validado por advertencia de fuente | Admitir firma AND |
-| Terminal `flow_2:n9` | Rechazado como terminal clínico | Excluir de rutas |
-| `route_templates` vacíos | Confirmado | Derivar firmas versionadas |
-| `flow_3` | Fuera de alcance clínico | Solo auditoría |
+La demo KISS se limita a este subgrafo. En un nodo XOR, una asignación válida
+habilita exactamente un sucesor. Una asignación incompleta o contradictoria
+hace que \(\operatorname{Exec}_D\) no esté definida y produce rechazo.
 
+## flow_3
+
+Describe el método de evidencia de la guía, no una trayectoria clínica. Se
+conserva en la auditoría documental y se excluye de \(D\), \(U\), \(V\) y \(E\)
+para este proyecto.
+
+## Invariantes
+
+- un solo inicio válido;
+- terminales alcanzables;
+- endpoints existentes;
+- etiquetas XOR exclusivas;
+- no se atraviesa el nodo aislado;
+- cada variante conserva la secuencia completa;
+- la canonical_signature ignora IDs accidentales;
+- el witness_assignment reproduce el terminal declarado.
+
+## Resultado
+
+El subgrafo XOR de flow_2 es suficiente para la instancia KISS. La fuente local
+privada es necesaria para reconstruir textos, páginas y predicados exactos.

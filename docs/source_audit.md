@@ -2,48 +2,63 @@
 
 ## Alcance
 
-La autoridad clínica está restringida a `gpc-05-hipertension-embarazo-2025`. El proyecto no incorpora pacientes, inferencias diagnósticas ni conocimiento médico externo.
+La única autoridad clínica es el snapshot
+**gpc-05-hipertension-embarazo-2025**. No se mezclan guías ni se completa
+información con conocimiento externo.
 
-## Conteos observados
+## Inventario observado
 
-| Artefacto | Conteo filtrado |
-|---|---:|
-| `recommendations.json` | 5 |
-| `tables.json` | 221 |
-| `flowcharts.json` | 3 |
-| Segmentos Phase 4 | 30 |
-| Unidades clínicas Phase 4 | 269 |
-| Grafos Phase 4 | 3 |
+| Artefacto | Conteo filtrado | Función |
+|---|---:|---|
+| recommendations.json | 5 | texto de recomendaciones y BPC |
+| tables.json | 221 | criterios y valores estructurados |
+| flowcharts.json | 3 | topología primaria |
+| segmentos Phase 4 | 30 | unidades auxiliares |
+| unidades clínicas Phase 4 | 269 | trazabilidad |
+| grafos Phase 4 | 3 | representación derivada |
 
-Los conteos coinciden con el baseline del prompt. Los hashes completos están en `data/manifests/source_manifest.json`.
+Los hashes se conservan en el manifiesto de fuente. Los conteos son controles de
+drift, no constantes universales.
 
-## Inventario funcional
+## Jerarquía de autoridad
 
-- `flowcharts.json`: lista JSON de tres objetos con `id`, metadatos de página/sección, nodos, aristas y advertencias.
-- `recommendations.json`: tres recomendaciones GRADE y dos BPC.
-- `tables.json`: 221 tablas heterogéneas. `table_003`, páginas 9-11, contiene la estructura explícita de niveles de riesgo y enunciados principales.
-- `structure.json`: metadatos documentales, 249 páginas declaradas y árbol de secciones.
-- `bibliografia.json`: referencias de la propia guía; se usa solo como metadato.
-- Phase 4: colecciones multiguía; todo acceso exige `source_id` exacto antes de contar o adaptar.
+1. **flowcharts.json:** nodos, aristas y etiquetas de transición.
+2. **decision_graphs.jsonl:** representación derivada para reconciliar inicio,
+   terminales e IDs.
+3. **tables.json y recommendations.json:** predicados, criterios, acciones y
+   texto fuente.
+4. **structure.json:** páginas, secciones y contexto.
+5. **Phase 4:** soporte de trazabilidad filtrado por source_id exacto.
 
-## Criterios de inclusión
+Una similitud textual no crea un crosswalk.
 
-1. El `source_id` coincide exactamente con la guía objetivo.
-2. El elemento conserva identificador y página o sección cuando existe.
-3. La estructura es explícita; una frase no se transforma automáticamente en predicado.
-4. Una correspondencia entre fuentes requiere una regla de crosswalk declarada.
-5. Toda ambigüedad se marca `human_review_required` o `blocked_by_evidence`.
+## Inclusión
 
-## Exclusiones
+- source_id exacto;
+- identificador reconstruible;
+- página o sección cuando exista;
+- estructura explícita;
+- estado de revisión;
+- hash de archivo.
 
-- `outputs/pilot_30`: sandbox histórico no revalidado.
-- `flow_3`: proceso metodológico de búsqueda/evaluación, no ruta clínica.
-- `gpc-05-hipertension-embarazo-resumida-2025`: variante de 28 páginas excluida. Su relación con la guía canónica figura como `mapping_status=draft`; no se fusiona ni se usa para completar evidencia.
-- `decision_graphs_filtered.jsonl`: sigue conteniendo múltiples guías y variantes; el nombre “filtered” no reemplaza el filtro exacto por `source_id`.
-- Guías con cualquier otro `source_id`.
-- Referencias bibliográficas no inspeccionadas como evidencia clínica.
-- Tablas sin relación explícita con el caso demostrativo.
+## Exclusión
+
+- cualquier otra guía;
+- resumen de 28 páginas con mapping draft;
+- outputs históricos no revalidados;
+- flow_3 como trayectoria clínica;
+- nodo informativo aislado de flow_2;
+- tablas sin relación explícita con la demo;
+- inferencias médicas no presentes en la fuente.
+
+## IDs públicos
+
+La demostración reemplaza identificadores y textos clínicos por símbolos
+\(S_i\) y \(R_i\). Conserva topología y testigos abstractos. La auditoría clínica
+completa solo puede ejecutarse con la fuente privada congelada.
 
 ## Resultado
 
-La fuente es suficiente para un caso educativo reproducible de cobertura algorítmica. No es suficiente para construir una herramienta clínica ni para completar relaciones ausentes mediante conocimiento externo.
+La fuente es suficiente para una prueba pre-generativa y reproducible. No es,
+por sí sola, evidencia de realismo de pacientes sintéticos ni autorización de
+uso clínico.

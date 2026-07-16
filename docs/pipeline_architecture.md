@@ -1,37 +1,50 @@
 # Arquitectura del pipeline
 
-```text
-adaptadores de fuente
-        |
-        v
-modelos canónicos tipados
-        |
-        v
-validación + reconciliación
-        |
-        v
-firmas + criterios + crosswalk
-        |
-        v
-escenarios U + objetivos V
-        |
-        v
-compatibilidad explicable E
-        |
-        v
-solver puro + métricas + evidencia
-```
+## Dos grafos, dos funciones
 
-## Separación de responsabilidades
+    GPC estructurada
+          │
+          ▼
+    D = grafo dirigido de decisión
+          │  enumera trayectorias completas
+          ▼
+    V = variantes clínicas de ruta por representar
 
-- Los adaptadores conocen formatos, no matching.
-- Los validadores conocen contratos, alcance y procedencia.
-- Las etapas de integración conocen reglas explícitas versionadas.
-- El constructor de compatibilidad es puro y determinista.
-- Los solvers conocen solo conjuntos y adyacencia.
-- Los reportes separan resultados clínico-estructurales, fixtures matemáticos y expectativas teóricas.
+    variables + dominios + restricciones
+          │
+          ▼
+    U = estructuras de caso clínico
 
-## Gates
+    U × V
+      │  testigo de ejecución compatible
+      ▼
+    B = grafo bipartito
+      │  matching máximo
+      ▼
+    assignment_manifest.json
+      │
+      ▼
+    generación sintética posterior
 
-Cada etapa rechaza entrada inválida. Un conflicto de fuente no se convierte en advertencia silenciosa; impide que el elemento llegue a `E`.
+El grafo dirigido \(D\) representa secuencia y decisión. El grafo bipartito
+\(B\) representa posibilidad de asignación. Mezclarlos impediría interpretar
+correctamente una arista.
 
+## Capas
+
+| Capa | Responsabilidad | Producto |
+|---|---|---|
+| fuente | congelar y reconciliar la GPC | manifiesto con hashes |
+| semántica | construir \(D\), rutas y restricciones | objetos trazables |
+| compatibilidad | ejecutar testigos | aristas justificadas |
+| optimización | resolver \(B\) | matching, déficit y assignment_manifest.json |
+| generación | instanciar y realizar datos | fuera del alcance actual |
+
+## Invariantes
+
+- ninguna variable clínica se agrega sin fuente;
+- ninguna variante se acepta sin ser alcanzable ni canonical_signature única;
+- ninguna arista se publica sin testigo;
+- una entrada del catálogo y una variante aparecen a lo sumo una vez en el matching;
+- una salida algorítmica no se etiqueta como validación clínica;
+- la futura redacción no puede alterar la ruta asignada.

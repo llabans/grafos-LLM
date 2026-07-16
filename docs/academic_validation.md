@@ -1,165 +1,144 @@
 # Validación académica y científica
 
-## Resumen ejecutivo
+## Estado de la afirmación
 
-El producto está validado como **demostración educativa de ingeniería algorítmica reproducible**, no como herramienta clínica. La afirmación central es limitada y verificable: dada una fuente local fijada por hash y una regla explícita de compatibilidad, las implementaciones propias calculan un matching máximo de cardinalidad 33 sobre un grafo bipartito de 75 escenarios, 35 objetivos y 267 aristas.
+El producto puede describirse como:
 
-La validación combina teoría, certificados estructurales, oráculos independientes, pruebas exhaustivas, auditoría de procedencia y medición reproducible. No evalúa la corrección médica de la guía, la efectividad de intervenciones, resultados en pacientes ni validez externa.
+> **prueba de concepto pre-generativa, algorítmicamente validada,
+> estructuralmente verificable y pendiente de validación clínica y generativa.**
 
-## Objeto y alcance de la validación
+No debe describirse como generador de pacientes clínicamente válidos porque el
+alcance termina antes de la instanciación masiva.
 
-| Objeto | Pregunta | Evidencia | Alcance del veredicto |
-|---|---|---|---|
-| Fuente | ¿Se usó el snapshot correcto? | 8 SHA-256, IDs y conteos | Integridad del snapshot local |
-| Semántica | ¿Las rutas usadas son alcanzables y respaldadas? | reconciliación, warnings, tests | Modelo estructural declarado |
-| Construcción | ¿`U`, `V` y `E_B` siguen reglas explícitas? | reglas versionadas y procedencia | Reproducibilidad del grafo |
-| Algoritmo | ¿El resultado es un matching máximo? | teorema de caminos aumentantes, Hall, oráculos | Correctitud para entradas probadas y demo |
-| Experimento | ¿Las métricas son regenerables? | protocolo, resultados crudos, ambiente | Descripción local del runtime |
-| Comunicación | ¿Se respetan alcance y rúbrica? | notebook, PPT, material extra | Entrega académica de 15 minutos |
+## Matriz afirmación-evidencia
 
-## Validez matemática
+| Afirmación | Evidencia requerida | Estado |
+|---|---|---|
+| el algoritmo encuentra matching máximo | pruebas, oráculo y certificado | demostrado en la demo |
+| la cardinalidad es siete | solución factible y cota superior | demostrado |
+| no existe matching perfecto | testigo de Hall \(8>7\) | demostrado |
+| cada arista posee testigo ejecutable | ejecución contra \(D\) | verificable; depende de fuente local para reconstrucción clínica |
+| variantes y restricciones reflejan la GPC | revisión de fuente y panel clínico | pendiente de panel independiente |
+| assignment_manifest.json mejora la generación | comparación prospectiva | pendiente |
+| los datos futuros serán fieles y privados | evaluación generativa multidimensional | fuera del alcance actual |
 
-### Definición correcta del estimando computacional
+## Validez algorítmica
 
-El “estimando” aquí no es estadístico. Es la función determinista:
+Un matching es un conjunto de aristas sin extremos repetidos. Según CLRS,
+capítulo 25, la diferencia simétrica con un camino aumentante incrementa la
+cardinalidad en uno. Cuando no existe camino aumentante, el matching es máximo.
 
-\[
-\theta(B)=\max_{M\subseteq E_B}\{|M|:M\text{ es matching}\}.
-\]
+La validación exige:
 
-Fijados los bytes de la fuente y la versión de reglas, `B` y `θ(B)` quedan determinados. El resultado `θ(B)=33` no tiene intervalo de confianza porque no proviene de una muestra aleatoria.
+- baseline por caminos aumentantes;
+- Hopcroft-Karp;
+- comparación con solver independiente;
+- enumeración exhaustiva de grafos pequeños;
+- invariancia ante renombramiento de vértices;
+- ausencia de duplicados en la salida.
 
-### Correctitud del solver
+La concordancia de software no valida las aristas clínicas.
 
-El criterio de Berge, desarrollado en CLRS §25.1, establece que un matching es máximo si y solo si no existe un camino aumentante. El baseline busca aumentos uno por uno. Hopcroft–Karp agrupa caminos aumentantes más cortos por capas BFS y DFS admisible; el Teorema 25.8 de CLRS sustenta la cota clásica `O(m√n)`.
+## Validez estructural
 
-La implementación usa `L=U`, `R=V`, `n=|L|+|R|` y `m=|E_B|`. Los vértices aislados se conservan, por lo que la inicialización explícita añade `O(n)`.
+Se inspeccionan:
 
-### Certificado específico del demo
+- disjunción de \(U\) y \(V\);
+- aristas únicamente entre particiones;
+- rutas alcanzables y completas;
+- testigo positivo por arista;
+- aislados conservados;
+- conteos \(7-8-14\);
+- matching de siete;
+- déficit de Hall uno.
 
-El matching de 33 pares es una cota inferior. Dos testigos de Hall aportan una cota superior:
+El constructo es **capacidad uno-a-uno pre-generativa**. La razón \(7/8\) no es
+sensibilidad, exactitud, cobertura poblacional ni prevalencia.
 
-- objetivo `rec_3`: `|S|=1>|N(S)|=0`;
-- grupo de severidad/BPC: `|S|=8>|N(S)|=7`.
+## Validez clínica
 
-Los componentes son disjuntos; el déficit total es 2. Por tanto, como `|V|=35`, cualquier matching tiene cardinalidad a lo sumo 33. La solución factible de 33 alcanza esa cota: es máxima.
+Un panel independiente debe evaluar:
 
-Este argumento es más fuerte que reportar únicamente concordancia de software, porque explica *por qué* quedan dos objetivos sin cubrir.
+1. fidelidad de cada ruta a la GPC;
+2. suficiencia y permisibilidad de variables;
+3. coherencia de restricciones;
+4. corrección del witness_assignment persistido;
+5. exclusión de combinaciones contraindicadas;
+6. trazabilidad de nodos, páginas y unidades fuente.
 
-## Validez computacional
+Los índices I-CVI y S-CVI/Ave pueden resumir acuerdo, pero deben acompañarse de
+distribuciones, comentarios, adjudicación y versión posterior. El juicio del
+equipo desarrollador o de un LLM no reemplaza revisión clínica independiente.
 
-### Triangulación de oráculos
+## Validez generativa
 
-Se verificaron 689 grafos etiquetados con `|L|,|R|≤3`. Para cada uno se compararon:
+Solo cuando existan instancias sintéticas se evaluarán:
 
-1. enumeración exhaustiva propia;
-2. DFS aumentante propio;
-3. Hopcroft–Karp propio;
-4. cardinalidad de NetworkX.
+- ejecución exacta de la variante asignada;
+- violaciones de restricciones;
+- consistencia clínica y temporal;
+- fidelidad marginal, conjunta y longitudinal;
+- diversidad y duplicación;
+- utilidad downstream;
+- privacidad y riesgo de divulgación.
 
-Todas las cardinalidades coincidieron. Se validaron además entradas vacías, aisladas, desconectadas, desbalanceadas, duplicadas o inválidas. Las 29 pruebas actuales pasan junto con `ruff` y `mypy`.
+Synthea, Zhang et al. y Zhou et al. muestran por vías diferentes que procedencia,
+fidelidad estadística y consistencia clínica no son equivalentes.
 
-La exhaustividad es sobre ese espacio finito de grafos pequeños; no constituye una prueba formal universal del código, pero reduce el riesgo de fallos de bordes y complementa el argumento algorítmico.
+## Correctitud de la instancia KISS
 
-### Separación de responsabilidades
+Cada estructura \(S_i\) tiene dos testigos:
 
-Los solvers reciben únicamente IDs y adyacencia; no importan módulos clínicos. Los adaptadores no ejecutan matching. Las reglas de compatibilidad son puras, versionadas y producen explicación tanto al aprobar como al rechazar. NetworkX solo aparece en `matching/oracles.py` y en pruebas/benchmarks.
+- severo: criterio \(i=1\) y demás criterios controlados, que ejecuta \(R_i\);
+- no severo: los siete criterios \(=0\), que ejecuta \(R_0\).
 
-## Validez de datos y procedencia
+Esto produce catorce aristas. El solver construye siete pares. Como ningún
+matching puede superar \(|U|=7\), el resultado es óptimo. Para \(S=V\),
+\(|S|=8>|N(S)|=7\), luego no existe matching que sature las ocho variantes.
 
-Los cinco agregados primarios y tres archivos Phase 4 se fijan por SHA-256. Los agregados contienen 5 recomendaciones/BPC, 221 tablas y 3 flujos. Tras filtrar Phase 4 por ID exacto se observan 30 segmentos, 269 unidades y 3 grafos.
+## Hipótesis científicas proporcionadas
 
-La reconciliación entre `flowcharts.json` y `decision_graphs.jsonl` no encontró nodos, aristas, textos, páginas o secciones modificados. Los elementos derivados conservan archivo local, entidad, página/sección y hash. La variante resumida y las demás guías se excluyen.
+### H1 algorítmica
 
-Conforme a los principios FAIR, la trazabilidad favorece que los resultados sean encontrables y reutilizables en su contexto; no convierte por sí misma el contenido en clínicamente válido. FAIR se usa aquí como principio de gestión de objetos digitales, no como sello de calidad médica.
+La implementación devuelve el óptimo para grafos bipartitos válidos.
 
-## Resultados reproducibles
+### H2 estructural
 
-### Grafo derivado de la GPC
+Toda arista aceptada corresponde a una instanciación que ejecuta exactamente la
+ruta declarada.
 
-| Métrica | Resultado |
-|---|---:|
-| `|U|` escenarios | 75 |
-| `|V|` objetivos | 35 |
-| `|E_B|` compatibilidades | 267 |
-| densidad | 0,101714 |
-| componentes, incluidos aislados | 6 |
-| objetivos aislados | 1 |
-| matching máximo | 33 |
-| cobertura uno-a-uno de objetivos | 94,2857 % |
-| escenarios no usados | 42 |
-| objetivos no cubiertos | 2 |
+### H3 clínica
 
-“Cobertura” significa proporción de objetivos con representante único en `M`: no es exactitud, sensibilidad, adherencia clínica ni cobertura poblacional.
+Los especialistas aceptan rutas, restricciones y testigos como fieles a la GPC.
 
-### Instrumentación del demo, 21 repeticiones
+### H4 generativa futura
 
-| Algoritmo | Mediana | Q1–Q3 | Escaneos | Llamadas DFS | Fases BFS | Pico trazado aprox. |
-|---|---:|---:|---:|---:|---:|---:|
-| DFS aumentante | 154,083 μs | 148,564–171,449 μs | 1.755 | 483 | 0 | 13.712 B |
-| Hopcroft–Karp | 150,086 μs | 145,209–154,622 μs | 1.191 | 132 | 2 | 15.592 B |
+Usar **assignment_manifest.json** reduce omisiones de variantes y violaciones
+lógicas frente a una generación directa sin capa de asignación.
 
-La diferencia de tiempo es pequeña y no se interpreta inferencialmente. En esta instancia domina el tamaño reducido; la ventaja conceptual de Hopcroft–Karp aparece con mayor claridad en familias escalables.
+H4 requiere comparación prospectiva y no se infiere de H1-H3.
 
-### Fixture matemático escalera
+## Novedad calibrada
 
-| Tamaño por lado | DFS mediana | HK mediana | DFS escaneos | HK escaneos |
-|---:|---:|---:|---:|---:|
-| 32 | 0,125 ms | 0,032 ms | 1.024 | 126 |
-| 128 | 2,085 ms | 0,124 ms | 16.384 | 510 |
-| 512 | 37,977 ms | 0,545 ms | 262.144 | 2.046 |
+La literatura apoya los bloques de la propuesta. La ausencia de un trabajo que
+integre exactamente todos los pasos es una inferencia de búsqueda dirigida. El
+lenguaje admisible es “integración potencialmente novedosa” y no “primer método
+mundial”.
 
-Para `k=512`, la reducción observada es aproximadamente 69,6 veces en mediana y 128,1 veces en escaneos. Es un caso determinista construido para mostrar revisitas del DFS; no es una distribución representativa de grafos reales.
+## Adecuación al nivel de maestría
 
-## Validez interna, externa y de constructo
+El trabajo:
 
-### Validez interna
+- formula un problema de optimización con supuestos explícitos;
+- implementa y contrasta algoritmos;
+- separa estimando determinista e incertidumbre clínica;
+- usa certificados, no solo salidas;
+- propone un protocolo prospectivo;
+- discute validez interna, externa y de constructo;
+- limita inferencias y evita confundir verificación con validación.
 
-Fortalezas:
+## Conclusión
 
-- hashes y conteos bloquean drift accidental;
-- transformaciones puras y ordenadas;
-- reconciliación evita doble ingestión;
-- oráculos independientes y testigos de Hall;
-- reglas de exclusión explícitas;
-- ninguna aleatoriedad oculta.
-
-Amenazas residuales:
-
-- una regla versionada podría ser conceptualmente discutible aun si está bien implementada;
-- los contratos se infieren del snapshot porque no todos los agregados traen esquema formal;
-- las pruebas exhaustivas cubren grafos pequeños, no todos los tamaños;
-- el microbenchmark depende de intérprete, carga y hardware.
-
-### Validez de constructo
-
-El constructo medido es “cobertura uno-a-uno bajo compatibilidad demostrable”. No equivale a importancia, completitud clínica ni utilidad pedagógica subjetiva. La restricción uno-a-uno deliberadamente hace competir objetivos que un mismo escenario podría ilustrar simultáneamente; esa propiedad responde al problema de matching y no a *set cover*.
-
-### Validez externa
-
-No se generaliza a otras GPC, versiones, idiomas, formatos, poblaciones ni sistemas de salud. Una nueva guía requiere nuevos adaptadores, reconciliación y reglas. El desempeño temporal no se extrapola fuera del ambiente registrado.
-
-## Validez científica y responsabilidad
-
-La contribución es metodológica: muestra cómo separar evidencia fuente, modelado y solver; cómo conservar procedencia; y cómo certificar un déficit de cobertura. No produce nuevo conocimiento clínico ni prueba una hipótesis epidemiológica.
-
-Las afirmaciones se clasifican en `docs/evidence_matrix.csv` como teóricas, de fuente, computacionales, experimentales o de alcance. Las afirmaciones experimentales se acompañan de protocolo y archivo de resultados crudos. Las afirmaciones sin soporte explícito se bloquean o quedan en revisión.
-
-## Reproducibilidad y auditabilidad
-
-Un revisor puede:
-
-1. verificar hashes con `validate_sources.py`;
-2. ejecutar el pipeline completo;
-3. reproducir los 29 tests y los 689 grafos exhaustivos;
-4. regenerar benchmarks con 21 repeticiones;
-5. inspeccionar las decisiones de compatibilidad y sus referencias;
-6. confirmar cardinalidad con NetworkX;
-7. revisar los dos testigos de Hall;
-8. comparar las salidas JSON deterministas.
-
-La reproducibilidad exige acceso autorizado a la fuente local; el ZIP no se distribuye dentro del repositorio.
-
-## Veredicto
-
-Los gates de teoría, estructura, algoritmo, procedencia y experimento están satisfechos para el alcance educativo declarado. El resultado es defendible en una maestría de ingeniería estadística porque combina formalización, control de datos, pruebas exhaustivas, análisis de complejidad, medición y límites de inferencia. Cualquier uso clínico permanece explícitamente fuera de alcance.
+La evidencia es suficiente para defender el matching y el déficit en la demo.
+La afirmación clínica queda condicionada al panel; la afirmación sobre calidad
+de datos queda diferida hasta que exista una generación evaluable.

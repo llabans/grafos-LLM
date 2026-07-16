@@ -1,141 +1,188 @@
-# Siete casos, ocho objetivos
+# Estructuras de caso clínico antes de generar datos sintéticos
 
-Versión KISS del proyecto final de algoritmos. Aplica **matching máximo en grafos
-bipartitos** a una pregunta de diseño educativo derivada de una sola guía:
+Versión KISS del proyecto final de Algoritmos. El repositorio implementa una
+capa combinatoria intermedia entre una guía de práctica clínica estructurada y
+la futura generación de datos clínicos sintéticos.
 
-```text
-gpc-05-hipertension-embarazo-2025
-```
+La unidad de trabajo no es todavía un paciente ni una historia redactada. Es una
+**estructura de caso clínico**: un objeto parametrizable con variables, dominios,
+restricciones lógicas, estado inicial, missingness permitido y procedencia.
 
-## Pregunta de investigación
+## Pregunta del proyecto
 
-> ¿Cómo asignar, uno a uno, escenarios clínico-educativos simulados compatibles
-> a microobjetivos de aprendizaje sobre severidad para maximizar el número de
-> microobjetivos cubiertos, sin reutilizar casos?
+> ¿Cómo asignar un catálogo finito de estructuras de caso clínico a variantes
+> clínicas de ruta derivadas de una GPC para maximizar el número de
+> asignaciones válidas uno-a-uno antes de generar los casos sintéticos?
 
-Versión oral: **tenemos siete casos y ocho objetivos; ¿cómo emparejarlos para
-cubrir tantos objetivos diferentes como sea posible, usando cada caso una sola
-vez?**
+Versión breve:
 
-## El árbol que presentamos
+> ¿Cuántas rutas diferentes de una guía pueden recibir estructuras diferentes,
+> sin usar una misma estructura dos veces?
 
-El subgrafo KISS tiene:
+## Lugar exacto en el proceso
 
-```text
-|U| = 7 casos simbólicos
-|V| = 8 microobjetivos
-|E| = 14 compatibilidades
-|M*| = 7 pares
-```
+    GPC oficial congelada
+        ↓
+    grafo dirigido de decisión
+        ↓
+    variantes clínicas de ruta completas y trazables
+        ↓
+    estructuras de caso clínico sin narrativa
+        ↓
+    compatibilidad lógica estructura-ruta
+        ↓
+    matching máximo bipartito
+        ↓
+    assignment_manifest.json
+        ↓
+    instancias clínicas y datos sintéticos futuros
 
-Cada caso representa uno de los siete criterios explícitos de severidad. Se
-conecta con dos objetivos: reconocer su criterio específico y reconocer la
-ruta/BPC común asociada a la presencia de severidad. Como un matching no puede
-reutilizar vértices, siete casos solo pueden acreditar siete objetivos.
+El proyecto termina en **assignment_manifest.json**. La asignación de valores,
+la redacción narrativa y la producción masiva de registros quedan fuera del
+alcance actual.
 
-El testigo de Hall lo resume:
+## Modelo bipartito
 
-```text
-|S| = 8 objetivos > |N(S)| = 7 casos compatibles
-```
+Sea \(B=(U,V,E)\):
 
-No es un error del algoritmo. Es una brecha de capacidad bajo la regla uno-a-uno.
+- \(U\): catálogo finito de estructuras de caso clínico para un lote piloto,
+  cada entrada con capacidad unitaria;
+- \(V\): variantes clínicas de ruta por representar, tipo
+  **ClinicalRouteVariant**;
+- \((u,v)\in E\): existe al menos una instancia permitida por \(u\) cuya
+  ejecución sobre el grafo de decisión recorre exactamente \(v\);
+- \(M\): asignaciones uno-a-uno estructura-ruta.
 
-## Qué significa “cubrir”
+Formalmente:
 
-“Cubrir un microobjetivo” significa asignarle un caso compatible como
-**representante principal**. No significa que:
+\[
+(u,v)\in E
+\iff
+\exists x\in \operatorname{Inst}(u):
+\operatorname{Exec}_D(x)=v.
+\]
 
-- el estudiante haya aprendido;
-- el caso sea clínicamente validado;
-- un caso real solo pueda enseñar un objetivo;
-- la cobertura sea sensibilidad, exactitud o beneficio clínico.
+Las variantes se deduplican mediante **canonical_signature**, que ignora el ID.
+La función \(\operatorname{Exec}_D\) es parcial y determinista sobre el subgrafo
+XOR: una instancia válida habilita exactamente una rama; datos insuficientes o
+contradictorios producen rechazo. Cada arista persiste el
+**witness_assignment** que la demuestra.
 
-La unicidad es útil para construir un banco de fichas, estaciones o actividades
-independientes sin doble conteo. Si un caso pudiera acreditar simultáneamente
-varios objetivos, el modelo apropiado sería cobertura, *set cover* o
-`b`-matching, no matching uno-a-uno.
+El objetivo es \(\max |M|\), con cada entrada del catálogo y cada variante
+utilizadas a lo sumo una vez.
 
-## Ejecutar el demo autónomo
+## Instancia KISS preespecificada
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-python scripts/run_kiss_severity_case.py
-```
+La demostración pública utiliza identificadores simbólicos y conserva solo la
+estructura mínima necesaria:
 
-Salida esperada:
+| Componente | Conteo |
+|---|---:|
+| estructuras de caso \(U\) | 7 |
+| variantes clínicas de ruta \(V\) | 8 |
+| aristas de compatibilidad \(E\) | 14 |
+| matching máximo \(M^*\) | 7 |
 
-```text
-PASS |U|=7 |V|=8 |E|=14 |M*|=7
-agreement dfs=7 hopcroft_karp=7
-hall_witness |S|=8 |N(S)|=7 deficiency=1
-```
+Las ocho variantes son siete trayectorias con un criterio de severidad focal y una
+trayectoria completa sin severidad. Cada estructura declara los siete criterios:
+permite activar su criterio focal manteniendo controlados los demás, y también
+permite fijar los siete como ausentes. Por eso cada estructura tiene dos aristas:
+una hacia su ruta severa focal y otra hacia la ruta común sin severidad.
 
-El demo no necesita el ZIP privado. El pipeline completo permanece disponible
-como anexo técnico y puede reproducirse configurando
-`BIPARTITE_MINSA_SOURCE_ROOT`.
+La reconstrucción exacta de textos, nodos y páginas requiere el snapshot local
+privado y congelado de la GPC. La demo pública no expone ese material.
 
-## Base algorítmica
+## Resultado y certificado
 
-La fuente curricular principal es el capítulo 25 de *Introduction to
-Algorithms*, 4.ª edición (Cormen, Leiserson, Rivest y Stein, 2022). El proyecto
-implementa desde cero:
+\[
+|M^*|=7.
+\]
 
-- búsqueda por caminos aumentantes;
-- Hopcroft-Karp con BFS por capas y DFS admisible;
-- certificado de déficit de Hall;
-- pruebas de invariantes, optimalidad y casos límite.
+La igualdad se certifica por dos cotas:
 
-La cota clásica de Hopcroft-Karp es `O(E√V)`; el almacenamiento es `O(V+E)`.
+1. se construye un matching factible de siete pares, luego
+   \(|M^*|\geq 7\);
+2. solo existen siete estructuras, luego \(|M^*|\leq 7\).
 
-## Estado científico, expresado sin exageración
+Además, para el conjunto \(S\) de las ocho variantes,
+\(|S|=8>|N(S)|=7\). La condición de Hall muestra un déficit estructural de una
+variante bajo la política uno-a-uno. El algoritmo no decide qué variante tiene mayor
+importancia clínica; para ello se necesitarían pesos o restricciones adicionales.
 
-El trabajo está:
+## Base teórica
 
-- **validado algorítmicamente** mediante dos solvers propios, oráculos y pruebas;
-- **fundamentado científicamente** por literatura sobre guías computables,
-  grafos de guías y simulación clínica educativa;
-- **pendiente de validación clínica de contenido y validación educativa** con
-  expertos y estudiantes.
+La fuente principal es Cormen, Leiserson, Rivest y Stein, *Introduction to
+Algorithms*, cuarta edición, capítulo 25. El proyecto utiliza:
 
-La revisión realizada no identificó, dentro de su alcance documentado, un
-trabajo que una exactamente: GPC estructurada → escenarios trazables → grafo
-bipartito caso-objetivo → matching máximo y testigo de Hall. Por eso la
-contribución se presenta como una **combinación potencialmente novedosa**, no
-como una prioridad universal demostrada.
+- definición de matching y matching máximo;
+- caminos alternantes y aumentantes;
+- diferencia simétrica \(M\oplus P\);
+- criterio de optimalidad por ausencia de caminos aumentantes;
+- Hopcroft-Karp y su procesamiento por capas;
+- condición de Hall como explicación de la imposibilidad de matching perfecto.
 
-## Entregables KISS
+Se implementan un baseline por caminos aumentantes y Hopcroft-Karp. La cota
+asintótica de Hopcroft-Karp es \(O(|E|\sqrt{|V_B|})\), donde \(V_B=U\cup V\).
+Para \(n=|U|+|V|\), \(m=|E|\) y costo de compatibilidad
+\(C_{\mathrm{compat}}\), la cota de ingeniería completa es:
 
-- `src/bipartite_minsa/kiss_case.py`: subgrafo autónomo.
-- `tests/test_kiss_severity_case.py`: prueba explícita `7-8-14-7`.
-- `data/samples/kiss_severity_graph.json`: artefacto pequeño y auditable.
-- `notebooks/research_var_cases_kiss.ipynb`: Colab de la exposición.
-- `docs/kiss_project_report.md`: informe principal.
-- `docs/kiss_student_explanation.md`: explicación conceptual detallada.
-- `docs/kiss_academic_validation.md`: validez y límites de las afirmaciones.
-- `docs/literature_review.md`: mapa de literatura y brecha.
-- `docs/validation_protocol.md`: protocolo para la siguiente fase empírica.
-- `output/pdf/material_extra_KISS_research_var_cases.pdf`: ficha visual de una página.
-- `scripts/build_kiss_handout.py`: generador reproducible de la ficha PDF.
-- `outputs/proyecto_final_KISS_research_var_cases.pptx`: presentación.
+\[
+T_{\mathrm{routes}}+T_{\mathrm{structures}}+
+O(|U||V|C_{\mathrm{compat}})+O(n+m\sqrt n).
+\]
 
-El “bosque” técnico original —75 escenarios, 35 objetivos, 267 aristas y matching
-33— se conserva en `docs/technical_appendix.md` y en la documentación original.
+## Hipótesis de trabajo
 
-## GOAL y LOOP
+> Si las variantes se derivan del grafo congelado, las estructuras se
+> construyen por una vía independiente desde el esquema permitido y las aristas
+> se aprueban mediante ejecución lógica reproducible, entonces el matching máximo
+> produce un manifiesto uno-a-uno de cardinalidad óptima y revela variantes que no
+> pueden recibir una estructura independiente.
 
-**GOAL:** maximizar microobjetivos distintos representados por casos distintos,
-con compatibilidad trazable y cero decisiones clínicas.
+La hipótesis es algorítmico-estructural. No afirma realismo clínico ni utilidad
+de los datos sintéticos aún no generados.
 
-```text
-DEFINIR → CONSTRUIR → RESOLVER → VERIFICAR → INTERPRETAR → REPETIR
-```
+## Capas de validez
 
-## Límite de seguridad
+- **Algorítmica:** correctitud del solver, pruebas y concordancia entre métodos.
+- **Estructural:** exactitud de particiones, aristas, cardinalidad y testigos de
+  déficit.
+- **Clínica:** fidelidad de variantes, restricciones y witness_assignments a
+  la GPC, evaluada por especialistas independientes.
+- **Generativa:** coherencia clínica, fidelidad de variante, diversidad, privacidad
+  y utilidad de las instancias sintéticas; corresponde a una fase posterior.
 
-Este repositorio no diagnostica, recomienda tratamientos, prioriza pacientes ni
-evalúa resultados clínicos. Los casos son escenarios simbólicos para educación y
-algoritmos. Una arista significa “compatibilidad demostrada bajo reglas
-declaradas”; no significa “conducta médica correcta”.
+Una capa no sustituye a otra. Un matching correcto sobre aristas equivocadas
+sigue siendo clínicamente inválido.
+
+## Productos
+
+- [Informe KISS](docs/kiss_project_report.md)
+- [Formulación matemática](docs/problem_formulation.md)
+- [Metodología](docs/methodology.md)
+- [Revisión de literatura](docs/literature_review.md)
+- [Validación académica y científica](docs/kiss_academic_validation.md)
+- [Protocolo de validación](docs/validation_protocol.md)
+- [Explicación para medicina y epidemiología](docs/kiss_student_explanation.md)
+- [Mapeo a CLRS, capítulo 25](docs/chapter_25_project_mapping.md)
+- [Guion de exposición](docs/presentation_outline.md)
+- [Cumplimiento de la rúbrica](docs/rubric_compliance.md)
+
+## Correspondencia con la rúbrica
+
+| Requisito | Evidencia |
+|---|---|
+| teoría | capítulo 25, formulación y demostración de optimalidad |
+| análisis | complejidad, Hall, hipótesis y límites |
+| aplicación | capa previa a generación clínica sintética desde una GPC |
+| código | implementaciones propias, pruebas y oráculo independiente |
+| Colab | notebook reproducible del caso KISS |
+| material adicional | documentación, protocolo y ficha de una página |
+| exposición | narrativa de 15 minutos con GOAL y LOOP |
+
+## Alcance responsable
+
+Este software no diagnostica, prescribe, prioriza pacientes ni valida una GPC.
+Tampoco genera todavía historias clínicas completas. Su resultado es un plan
+combinatorio trazable, **assignment_manifest.json**, para una futura etapa de
+generación sintética.

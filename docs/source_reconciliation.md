@@ -1,26 +1,38 @@
-# Reconciliación entre flujogramas y Phase 4
+# Reconciliación de fuente primaria y Phase 4
 
 ## Método
 
-Para cada `flow_id` se compararon identificadores de nodo, texto, tipo, endpoints y etiquetas. `flowcharts.json` se trató como fuente primaria; `decision_graphs.jsonl` se filtró por la guía objetivo y se trató como derivado.
+Para cada flow_id se comparan:
 
-## Resultado estructural
+- IDs y tipos de nodo;
+- texto normalizado;
+- endpoints;
+- etiquetas;
+- entrada;
+- terminales;
+- procedencia.
 
-| Flujo | Nodos primario/derivado | Aristas primario/derivado | Cambios de texto o etiquetas | Resultado |
+**flowcharts.json** es la topología primaria. **decision_graphs.jsonl** es un
+derivado y nunca se fusiona como un segundo grafo.
+
+## Resultado
+
+| Flujo | nodos primario/derivado | aristas primario/derivado | discrepancias textuales | decisión |
 |---|---:|---:|---:|---|
-| `flow_1` | 6/6 | 5/5 | 0 | Equivalente |
-| `flow_2` | 9/9 | 7/7 | 0 | Equivalente |
-| `flow_3` | 8/8 | 8/8 | 0 | Equivalente |
+| flow_1 | 6/6 | 5/5 | 0 | reconciliado; semántica AND |
+| flow_2 | 9/9 | 7/7 | 0 | reconciliado; subgrafo XOR KISS |
+| flow_3 | 8/8 | 8/8 | 0 | documental, fuera de alcance |
 
-Phase 4 enriquece la representación con inicio, terminales, IDs de unidades y trazabilidad. No se integrará como un segundo conjunto de nodos o aristas.
+## Controles semánticos
 
-## Diferencias semánticas que requieren control
+- Las dos salidas positivas de flow_1 son paralelas, no XOR.
+- El nodo aislado de flow_2 no se acepta como terminal por grado cero.
+- Los route_templates derivados están vacíos; las variantes se enumeran
+  localmente desde \(D\).
+- Cada variante se deduplica por canonical_signature, no por ID.
 
-- `flow_1`: la fuente primaria advierte que dos aristas `Sí` desde `n1` pueden ejecutarse simultáneamente. Se clasifica como `AND`.
-- `flow_2`: el derivado incluye `n9` entre terminales por ausencia de salidas. La fuente primaria lo describe como nota aislada. Se conserva como información, pero se excluye de terminales alcanzables y firmas.
-- Todos los `route_templates` están vacíos. Las firmas deben derivarse localmente y validarse.
+## Política
 
-## Política de resolución
-
-Una diferencia de nodos, aristas o etiquetas bloquea la construcción de escenarios para ese flujo. Un enriquecimiento derivado solo se acepta si no contradice la fuente primaria y conserva procedencia.
-
+Una diferencia de nodo, arista o etiqueta bloquea la reconstrucción. Un
+enriquecimiento derivado solo se acepta si no contradice la fuente primaria.
+Ningún conflicto se resuelve mediante un LLM.

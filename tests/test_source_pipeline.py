@@ -105,8 +105,8 @@ def test_bipartite_graph_maximum_and_two_gap_mechanisms(source_root: Path) -> No
     by_mechanism = {item.mechanism: item for item in witnesses}
     assert by_mechanism["isolated_evidence_gap"].deficiency == 1
     assert by_mechanism["capacity_bottleneck"].deficiency == 1
-    assert len(by_mechanism["capacity_bottleneck"].target_ids) == 8
-    assert len(by_mechanism["capacity_bottleneck"].neighboring_scenario_ids) == 7
+    assert len(by_mechanism["capacity_bottleneck"].clinical_route_variant_ids) == 8
+    assert len(by_mechanism["capacity_bottleneck"].neighboring_case_structure_ids) == 7
 
 
 def test_unsupported_recommendation_never_becomes_an_edge(source_root: Path) -> None:

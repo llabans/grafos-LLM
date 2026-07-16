@@ -1,35 +1,104 @@
-# Notas verificadas del Capítulo 25
+# Notas verificadas del capítulo 25
 
 ## Identificación
 
-- Libro: Cormen, Leiserson, Rivest y Stein, *Introduction to Algorithms*.
-- Edición: cuarta, 2022.
-- Capítulo: 25, “Matchings in Bipartite Graphs”.
-- Editorial: MIT Press. ISBN impreso `9780262046305`; ISBN electrónico `9780262367509`.
-- Rango del capítulo: páginas impresas 704-743; páginas físicas PDF 911-963.
-- Sección central: §25.1, páginas impresas 705-716; páginas PDF 912-927.
-- El archivo es una remaquetación Calibre. Para que la cita sea reconstruible se informa siempre la pareja **página impresa / página PDF** cuando está disponible.
+- Cormen, Leiserson, Rivest y Stein.
+- *Introduction to Algorithms*, cuarta edición, 2022.
+- Capítulo 25: “Matchings in Bipartite Graphs”.
+- Rango aproximado: páginas impresas 704-743; PDF local 911-963.
+- Sección central: §25.1, matching bipartito máximo.
 
-## Conceptos centrales
+## Definiciones
 
-En las páginas impresas 704-705 / PDF 911-913 se define matching como un subconjunto de aristas sin vértices incidentes repetidos y se introduce el matching máximo por cardinalidad. La sección 25.1 distingue matching maximal de máximo y define caminos alternantes y aumentantes.
+Para un grafo no dirigido \(G=(V,E)\), un matching \(M\subseteq E\) contiene a
+lo sumo una arista incidente por vértice. Un matching **maximal** no admite una
+arista adicional de manera local. Un matching **máximo** tiene la mayor
+cardinalidad entre todos los matchings. Todo máximo es maximal, pero no al
+revés.
 
-Las páginas impresas 706-708 / PDF 914-917 desarrollan la diferencia simétrica, el incremento de cardinalidad (Lema 25.1), el aumento mediante caminos disjuntos (Corolario 25.2), la estructura de la diferencia entre dos matchings (Lema 25.3) y el criterio de ausencia de caminos aumentantes (Corolario 25.4).
+En el proyecto, una arista seleccionada reserva una entrada del catálogo de
+estructuras para una variante de ruta. La unicidad no es una propiedad médica:
+es la capacidad unitaria del problema de asignación.
 
-Las páginas impresas 708-715 / PDF 917-926 presentan Hopcroft--Karp: conjuntos maximales de caminos aumentantes más cortos y disjuntos, orientación del grafo, capas BFS, búsqueda DFS restringida, invariantes de longitud y el análisis que culmina en el Teorema 25.8 con tiempo `O(E sqrt(V))` bajo la notación del libro.
+## Caminos aumentantes
 
-En la notación del proyecto, `L=U`, `R=V`, `X=L∪R`, `n=|X|` y `m=|E_B|`. La cota clásica se escribe `O(m√n)` sobre el grafo activo. Como la implementación admite listas explícitas de vértices aislados, se informa además una cota completa conservadora `O(n + m√n)` y espacio `O(n+m)`. Esta última precisión es análisis de ingeniería del proyecto, no una cita textual del libro.
+Un camino \(M\)-alternante alterna aristas dentro y fuera de \(M\). Es
+\(M\)-aumentante si sus extremos están libres. Por tener una arista no
+emparejada adicional:
 
-## Adaptación del proyecto
+\[
+M'=M\oplus P,\qquad |M'|=|M|+1.
+\]
 
-El baseline DFS que aumenta un camino por iteración sigue la estrategia general descrita al final de la prueba del Corolario 25.4, pero su pseudocódigo concreto es una decisión de ingeniería del proyecto. La implementación Hopcroft-Karp usa la variante estándar con emparejamientos `pair_left`, `pair_right` y distancias por BFS; no reproduce literalmente la construcción material de `G_M`, `H` y `H^T`, pero mantiene el mismo principio de capas y DFS admisible.
+Este es el Lema 25.1. El Corolario 25.2 extiende el resultado a caminos
+aumentantes disjuntos por vértices.
 
-## Secciones no centrales
+## Criterio principal de optimalidad
 
-- §25.2 (impresas 716-723 / PDF 927-936): matrimonio estable; se menciona solo para distinguir objetivos.
-- §25.3 (impresas 723-739 / PDF 936-958, con ejercicios y problemas hasta PDF 962): asignación ponderada y algoritmo húngaro; se usa como contraste, no como solver.
-- Notas (impresa 743 / PDF 962-963): atribución histórica a Hopcroft--Karp, Berge, Kuhn y otros.
+El Corolario 25.4 establece:
+
+> \(M\) es máximo si y solo si no existe un camino \(M\)-aumentante.
+
+Este es el certificado teórico principal del solver. La condición de Hall se
+usa adicionalmente para explicar por qué no existe matching que sature todas
+las variantes.
+
+## Hopcroft-Karp
+
+El algoritmo repite:
+
+1. formar el digrafo alternante;
+2. usar BFS para encontrar la longitud mínima de aumento;
+3. obtener un conjunto maximal de caminos mínimos disjuntos mediante DFS
+   admisible;
+4. aplicar diferencia simétrica a todos;
+5. terminar cuando el conjunto esté vacío.
+
+CLRS demuestra que las longitudes mínimas aumentan entre fases y que el número
+de fases es \(O(\sqrt n)\). Cada fase cuesta \(O(m)\), por lo que:
+
+\[
+T_{\mathrm{HK}}=O(m\sqrt n).
+\]
+
+La implementación práctica con arreglos de pares y distancias mantiene el
+principio de capas aunque no materialice literalmente todos los grafos
+intermedios de la exposición.
+
+## Hall
+
+El ejercicio 25.1-5 formula la condición:
+
+\[
+|A|\leq|N(A)|\quad\text{para todo }A\subseteq L
+\]
+
+como condición necesaria y suficiente de matching perfecto cuando las
+particiones tienen el mismo tamaño. En la demo, se aplica al lado de las
+variantes: ocho variantes comparten siete estructuras vecinas. El déficit uno
+explica la imposibilidad de saturarlas.
+
+## Complejidad del pipeline completo
+
+CLRS analiza el solver, no la construcción clínica del grafo. En este proyecto:
+
+\[
+T_{\mathrm{total}}=
+T_{\mathrm{routes}}+
+T_{\mathrm{structures}}+
+O(|U||V|C_{\mathrm{compat}})+
+O(n+m\sqrt n).
+\]
+
+La evaluación de compatibilidad puede dominar el costo aun cuando el matching
+sea eficiente.
+
+## Secciones no utilizadas
+
+- §25.2, matrimonio estable: no hay preferencias.
+- §25.3, matching de peso máximo: no hay pesos en KISS.
 
 ## Política de cita
 
-El archivo completo tiene SHA-256 `76c37e38a15e938dcff6a027aed03f09418423074b1a9ccdda027ba71a5d61a4`. Todas las paráfrasis indican sección y paginación dual; no se reproducen pasajes extensos.
+Se parafrasea la teoría y se cita capítulo, sección y resultado. No se
+reproducen pasajes extensos del libro.

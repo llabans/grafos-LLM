@@ -54,11 +54,11 @@ def graph_metrics(graph: BipartiteGraph, result: MatchingResult | None = None) -
         metrics.update(
             {
                 "matching_cardinality": result.cardinality,
-                "target_coverage_percent": (
+                "clinical_route_variant_coverage_percent": (
                     0.0 if not graph.right else 100.0 * result.cardinality / len(graph.right)
                 ),
-                "uncovered_targets": sorted(set(graph.right) - matched_right),
-                "unused_scenarios": sorted(
+                "unassigned_clinical_route_variants": sorted(set(graph.right) - matched_right),
+                "unused_case_structures": sorted(
                     set(graph.left) - {left_id for left_id, _ in result.pairs}
                 ),
             }

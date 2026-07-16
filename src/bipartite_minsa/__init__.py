@@ -1,4 +1,4 @@
-"""Emparejamiento bipartito auditable para un caso educativo MINSA."""
+"""Asignación bipartita auditable previa a la generación clínica sintética."""
 
 from bipartite_minsa.matching.augmenting_path import AugmentingPathMatcher
 from bipartite_minsa.matching.graph import BipartiteGraph

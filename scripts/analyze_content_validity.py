@@ -1,4 +1,4 @@
-"""Resume un CSV completado del panel mediante I-CVI y S-CVI/Ave."""
+"""Resume la revisión de estructuras, variantes y aristas con I-CVI y S-CVI/Ave."""
 
 from __future__ import annotations
 

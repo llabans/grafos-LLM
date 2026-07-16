@@ -2,168 +2,233 @@
 
 ## Objetivo
 
-Evaluar de forma separada:
+Validar por separado:
 
-1. la validez clínica de contenido de los escenarios y sus vínculos;
-2. la validez educativa de los microobjetivos;
-3. la utilidad del matching como herramienta de curación de un banco de casos.
+1. correctitud algorítmica;
+2. consistencia estructural del grafo;
+3. fidelidad clínica a la GPC;
+4. desempeño generativo futuro.
 
-El protocolo no busca validar un sistema de soporte a decisiones clínicas.
+El protocolo no valida un sistema de soporte a decisiones ni autoriza uso con
+pacientes reales.
 
-## Fase 0 — registro y congelamiento
+## Fase 0. Registro y congelamiento
 
-Antes de recibir calificaciones:
+Antes de revisar resultados:
 
-- congelar la versión de la GPC, reglas, grafo y formulario;
-- registrar hipótesis, desenlaces y umbrales;
-- asignar IDs ciegos a casos y objetivos;
-- separar desarrolladores de revisores;
-- conservar todas las respuestas, incluidas las discordantes.
+- congelar GPC, archivos y hashes;
+- versionar \(D\), \(U\), \(V\), reglas y testigos;
+- registrar hipótesis y umbrales;
+- definir el uso previsto de los futuros datos;
+- separar desarrolladores, revisores clínicos y analistas cuando sea posible;
+- conservar todas las discordancias.
 
-## Fase 1 — panel de contenido
+## Fase 1. Verificación algorítmica
 
-### Participantes
+### Unidades
 
-Panel independiente con diversidad de roles:
+- grafos de prueba;
+- demo \(7-8-14\);
+- salida de baseline;
+- salida de Hopcroft-Karp;
+- oráculo independiente.
 
-- especialistas clínicos en obstetricia;
-- profesionales con experiencia en educación médica;
-- una persona con experiencia metodológica o epidemiológica.
+### Gates
 
-El número final debe justificarse antes de analizar datos. No se rellenarán
-calificaciones faltantes ni se sustituirán revisores después de observar los
-resultados.
+- cardinalidades idénticas;
+- matching válido;
+- ausencia de camino aumentante al terminar;
+- serialización determinista;
+- concordancia exhaustiva en grafos pequeños;
+- invariancia ante permutación de IDs.
 
-### Unidades evaluadas
+Un fallo bloquea las fases posteriores.
 
-- siete escenarios simbólicos;
-- ocho microobjetivos;
-- catorce aristas caso-objetivo;
-- una muestra de pares rechazados para evaluar especificidad de la regla.
+## Fase 2. Validación estructural
 
-### Escala
+### Unidades
 
-Cada unidad se califica de 1 a 4:
+- ocho variantes clínicas de ruta;
+- siete estructuras;
+- catorce aristas;
+- catorce testigos positivos;
+- muestra preespecificada de pares rechazados.
 
-1. no pertinente/inadecuada;
-2. requiere revisión mayor;
-3. pertinente con revisión menor;
-4. pertinente y clara.
+### Pruebas
 
-Dominios:
+- cada ruta inicia y termina correctamente;
+- cada predicado es satisfacible;
+- cada testigo cumple dominios y restricciones;
+- \(\operatorname{Exec}_D(x)=v\), con ejecución parcial determinista y ramas XOR;
+- los testigos negativos no alcanzan la ruta;
+- no existen aristas huérfanas o duplicadas.
 
-- fidelidad a la GPC;
-- coherencia clínica;
-- relevancia educativa;
-- claridad;
-- suficiencia de la compatibilidad.
+### Desenlace primario
 
-Se añade una respuesta binaria independiente: “¿aprobaría esta arista?” y un
-campo obligatorio de justificación cuando la respuesta sea no.
+Tasa de testigos que ejecutan exactamente la variante asignada. Para restricciones
+duras de la demo se exige 100 %. Una sola violación bloquea la arista.
+
+## Fase 3. Validez clínica de contenido
+
+### Panel
+
+Panel independiente con:
+
+- especialistas en obstetricia y medicina materno-fetal;
+- experiencia con la GPC o el contexto asistencial;
+- una persona de metodología o epidemiología;
+- manejo declarado de conflictos de interés.
+
+El tamaño y el umbral se fijan antes de analizar. Como referencia metodológica,
+un panel de 6 a 10 especialistas permite usar I-CVI, pero la decisión final debe
+considerar el número exacto y la probabilidad de acuerdo por azar.
+
+### Cegamiento
+
+Los revisores reciben IDs y evidencia fuente, pero no el resultado de matching
+ni la decisión de otros revisores. Se aleatoriza el orden de unidades.
+
+### Dominios, escala 1 a 4
+
+1. fidelidad de la ruta a la GPC;
+2. suficiencia de variables;
+3. coherencia de restricciones;
+4. validez del testigo;
+5. corrección de la acción terminal;
+6. trazabilidad;
+7. riesgo de interpretación clínica incorrecta.
+
+Puntuaciones 1-2 significan revisión mayor; 3-4, aceptación de contenido con o
+sin ajuste menor. Toda puntuación 1-2 requiere justificación.
 
 ### Indicadores
 
-Para cada unidad y dominio:
-
 \[
-I\text{-}CVI=\frac{\#\text{revisores con puntuación 3 o 4}}
-{\#\text{revisores con respuesta válida}}.
+I\text{-}CVI_i=
+\frac{\#\text{revisores que puntúan 3 o 4}}
+{\#\text{respuestas válidas}}.
 \]
-
-El índice global será:
 
 \[
 S\text{-}CVI/Ave=\operatorname{media}(I\text{-}CVI_i).
 \]
 
-Se reportarán también distribución completa, acuerdo porcentual, comentarios y
-decisiones de revisión. Los umbrales se preespecificarán según el tamaño del
-panel y no se modificarán tras observar los datos. La metodología se apoya en
-Polit, Beck y Owen (2007), DOI `10.1002/nur.20199`.
+Se reportan además:
 
-### Gate
+- distribución completa;
+- acuerdo porcentual;
+- kappa modificado si el tamaño lo permite;
+- comentarios y causas;
+- cambios entre rondas;
+- pares rechazados y no solo los aprobados.
 
-Un caso o arista que no alcance el umbral preespecificado se revisa y regresa a
-una segunda ronda. No se elimina silenciosamente. El historial de cambios debe
-mostrar qué fuente y qué regla se modificaron.
+Un promedio global alto no rescata una restricción clínicamente crítica.
 
-## Fase 2 — estudio de utilidad para autoría
+### Adjudicación
 
-### Diseño propuesto
+Las unidades bajo umbral regresan al LOOP:
 
-Estudio cruzado con docentes o autores de casos:
+    observación → fuente → regla → testigo → nueva revisión
 
-- condición A: selección manual con lista estructurada;
-- condición B: selección asistida por grafo y matching;
-- orden contrabalanceado;
-- mismos objetivos y tiempo máximo;
-- evaluación final cegada al método cuando sea posible.
+No se eliminan ni corrigen silenciosamente.
 
-### Desenlace primario
+## Fase 4. Evaluación de assignment_manifest.json
 
-Número de microobjetivos distintos con un representante compatible y distinto.
+Se comprueba:
 
-### Desenlaces secundarios
+- cardinalidad óptima;
+- unicidad de IDs;
+- testigo y hash por par;
+- explicación de variantes libres;
+- ausencia de prioridad clínica implícita;
+- posibilidad de reproducir cada asignación.
 
-- redundancia del banco;
-- tiempo de construcción;
-- número de vínculos rechazados por expertos;
-- carga percibida y usabilidad;
-- comprensión de la brecha `8>7`.
+### Comparación exploratoria futura
 
-La muestra se calculará a partir de un piloto o de un efecto mínimo relevante
-definido antes de la prueba principal. No se escogerá `n` por conveniencia para
-obtener significación.
+Comparar generación directa contra generación guiada por
+**assignment_manifest.json**:
 
-## Fase 3 — piloto educativo
+- misma GPC y mismo número de intentos;
+- misma tecnología generativa;
+- semillas y parámetros registrados;
+- evaluación clínica cegada;
+- desenlace primario: proporción que ejecuta la ruta solicitada sin violaciones.
 
-Solo después de aprobar la fase de contenido:
+La hipótesis es que la capa previa reduce fallos lógicos y omisiones. No se
+declara confirmada en esta entrega.
 
-- población y nivel formativo claramente definidos;
-- objetivos observables y evaluación alineada;
-- comparación pre/post o grupo comparador según factibilidad;
-- análisis de dificultad, discriminación y errores por objetivo;
-- registro de eventos o contenidos potencialmente inseguros;
-- conclusión limitada al contexto y cohorte estudiados.
+## Fase 5. Validación generativa
 
-La cobertura del grafo es un atributo del banco; el aprendizaje es un desenlace
-del estudiante. Deben analizarse por separado.
+Solo comienza cuando existan instancias o registros sintéticos.
 
-## Fase 4 — replicación estructural
+### Fidelidad lógica
 
-Como trabajo futuro, aplicar las mismas reglas a una segunda GPC sin mezclarlas
-en un solo grafo. Construir `B1` y `B2` y comparar:
+- tasa de ejecución de ruta;
+- violaciones de condiciones obligatorias;
+- presencia de combinaciones prohibidas;
+- coherencia de estado inicial y terminal.
 
-- proporción de entidades trazables;
-- densidad;
-- déficit de Hall;
-- estabilidad de decisiones expertas;
-- cambios requeridos en las reglas.
+### Fidelidad estadística
 
-Esta fase evalúa transportabilidad del método, no validez clínica universal.
+- distribuciones marginales;
+- asociaciones y coocurrencias;
+- temporalidad;
+- prevalencia de rutas según una fuente externa válida;
+- análisis de subgrupos.
 
-## Flujo LOOP con gates
+### Diversidad
 
-```text
-CONGELAR
-  ↓ gate de fuente
-CONSTRUIR
-  ↓ gate algorítmico
-REVISAR POR EXPERTOS
-  ↓ gate de contenido
-PILOTAR CON AUTORES/ESTUDIANTES
-  ↓ gate educativo
-REPLICAR
-  ↺ actualizar reglas con historial explícito
-```
+- duplicados exactos y aproximados;
+- concentración por estructura;
+- cobertura de dominios permitidos;
+- entropía o soporte efectivo cuando sea apropiado.
 
-## Transparencia
+### Consistencia clínica
+
+- revisión cegada por especialistas;
+- errores de medicación, temporalidad o causalidad;
+- severidad y accionabilidad de cada error;
+- acuerdo interevaluador.
+
+### Utilidad
+
+Se define por el uso previsto. Para modelos predictivos puede emplearse
+Train-on-Synthetic, Test-on-Real, con un conjunto real retenido y no usado por
+el generador. No existe una métrica universal de utilidad.
+
+### Privacidad
+
+Si el generador aprende de registros reales:
+
+- membership inference;
+- attribute inference;
+- nearest-neighbor disclosure;
+- memorization;
+- evaluación por subgrupos.
+
+La etiqueta “sintético” no garantiza privacidad.
+
+## Fase 6. Replicación
+
+Aplicar el protocolo a una segunda GPC sin mezclar fuentes:
+
+- construir \(D_2\), \(U_2\), \(V_2\) y \(B_2\);
+- medir porcentaje de rutas con estructura;
+- comparar densidad y déficit;
+- registrar reglas nuevas;
+- evaluar estabilidad de decisiones expertas.
+
+Esto estudia transportabilidad, no validez clínica universal.
+
+## Criterios de reporte
 
 Publicar:
 
-- formulario y diccionario de variables;
-- reglas de exclusión;
-- análisis planeado;
-- datos anonimizados de calificaciones cuando el consentimiento lo permita;
-- todos los resultados, no solo los favorables;
-- versión exacta de código, GPC y artefactos.
+- protocolo y desviaciones;
+- versiones y hashes;
+- diccionario de variables;
+- reglas de inclusión y exclusión;
+- todos los resultados algorítmicos;
+- calificaciones anonimizadas cuando sea éticamente posible;
+- resultados generativos favorables y desfavorables;
+- limitaciones y conflictos de interés.

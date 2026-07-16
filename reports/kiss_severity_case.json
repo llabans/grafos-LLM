@@ -1,16 +1,31 @@
 {
-  "status": "PASS",
-  "scope": "educational_non_clinical",
-  "graph": {"left_vertices": 7, "right_vertices": 8, "edges": 14},
-  "maximum_matching": {
-    "cardinality": 7,
-    "objective_coverage_percent": 87.5,
-    "solver_agreement": {"augmenting_path_dfs": 7, "hopcroft_karp": 7}
+  "certificates": {
+    "existential_witnesses": 14,
+    "reexecution_status": "PASS"
+  },
+  "clinical_content_validation": "pending_expert_review",
+  "generation_status": "not_started",
+  "graph": {
+    "case_structures": 7,
+    "clinical_route_variants": 8,
+    "compatibility_edges": 14
   },
   "hall_witness": {
-    "target_count": 8,
-    "neighboring_case_count": 7,
-    "deficiency": 1
+    "clinical_route_variant_count": 8,
+    "deficiency": 1,
+    "neighboring_case_structure_count": 7
   },
-  "interpretation": "Siete casos distintos pueden representar como máximo siete de ocho microobjetivos bajo asignación uno-a-uno."
+  "interpretation": "Siete estructuras distintas pueden reservar como máximo siete de ocho variantes clínicas bajo asignación uno-a-uno.",
+  "maximum_matching": {
+    "cardinality": 7,
+    "route_variant_assignment_percent": 87.5,
+    "solver_agreement": {
+      "augmenting_path_dfs": 7,
+      "hopcroft_karp": 7,
+      "networkx_oracle": 7
+    }
+  },
+  "scope": "algorithmic_and_structural_only",
+  "stage": "pre_synthetic_generation_assignment",
+  "status": "PASS"
 }

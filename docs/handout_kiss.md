@@ -1,48 +1,57 @@
-# Siete casos, ocho objetivos
+# Siete estructuras, ocho variantes
 
 ## Pregunta
 
-¿Cómo asignar casos clínico-educativos simulados compatibles a microobjetivos
-distintos, uno a uno, para maximizar la cobertura sin reutilizar casos?
+¿Cuántas variantes clínicas de una GPC pueden reservar una estructura de caso
+independiente antes de generar datos sintéticos?
 
 ## Modelo
 
 | Partición | Contenido | Tamaño |
 |---|---|---:|
-| `U` | escenarios de severidad | 7 |
-| `V` | 7 criterios + 1 ruta/BPC | 8 |
-| `E` | criterio propio + BPC por caso | 14 |
+| \(U\) | catálogo piloto de estructuras | 7 |
+| \(V\) | variantes clínicas de ruta | 8 |
+| \(E\) | compatibilidades con testigo | 14 |
 
-Un matching no comparte casos ni objetivos.
+\[
+(u,v)\in E
+\iff
+\exists x\in\operatorname{Inst}(u):
+\operatorname{Exec}_D(x)=v.
+\]
 
-## Resultado y certificado
+## Resultado
 
-```text
-|M*| = 7             cobertura estructural = 7/8 = 87,5 %
-Hall: |S|=8 > |N(S)|=7                 déficit = 1
-```
+\[
+|M^*|=7.
+\]
 
-Siete pares son factibles y no puede haber ocho porque solo existen siete casos.
+- existe un matching de siete;
+- no puede existir uno mayor que \(|U|\);
+- Hall: \(8>7\), déficit uno.
 
-## Decisión de diseño
+## Semántica
 
-1. añadir un caso compatible e independiente; o
-2. permitir cobertura múltiple y cambiar a otro modelo.
+Siete variantes incluyen un criterio de severidad focal. La octava no tiene
+severidad. Cada estructura puede instanciar su variante focal o la variante
+común con los siete criterios ausentes.
 
-## Qué significa “cubrir”
+## Producto
 
-Asignar un caso como representante principal del objetivo. No demuestra
-aprendizaje, realismo clínico ni beneficio en pacientes.
+**assignment_manifest.json** contiene pares, testigos, hashes, variante libre y
+estado de validación.
 
 ## Base
 
-- Cormen et al., *Introduction to Algorithms*, 4.ª ed., capítulo 25.
-- Hopcroft y Karp (1973), DOI `10.1137/0202019`.
-- Kandula y Bhattacharyya (2023), arXiv `2308.02984`.
-- Gupta et al. (2025), arXiv `2501.13984`.
-- Hicke et al., MedSimAI (2025/2026), arXiv `2503.05793`.
+- CLRS, cuarta edición, capítulo 25;
+- Hopcroft y Karp, 1973;
+- Peleg et al., 2003;
+- GLIF3, 2004;
+- Synthea, 2018;
+- CPGPrompt, 2026.
 
-## Estado
+## Límites
 
-Algoritmo validado; propuesta científicamente fundamentada; validación experta
-del contenido y evaluación educativa pendientes.
+Se validan algoritmo y topología. La fidelidad clínica requiere panel. La
+fidelidad, diversidad, utilidad y privacidad sintéticas se evalúan después de
+generar.

@@ -2,73 +2,170 @@
 
 ## Título
 
-**Emparejamiento bipartito máximo para cobertura auditable de datos estructurados de una GPC MINSA**
+**Matching máximo entre estructuras de caso clínico y variantes de ruta de una guía como
+paso previo a la generación de datos sintéticos**
 
 ## Resumen
 
-Se desarrolló una aplicación reproducible de matching máximo bipartito orientada a la curación y auditoría educativa de escenarios derivados de la GPC `gpc-05-hipertension-embarazo-2025`. El diseño separa el grafo dirigido de flujogramas del grafo bipartito de cobertura, reconcilia fuente primaria y Phase 4, conserva procedencia por entidad y construye compatibilidades únicamente mediante reglas explícitas.
+Se diseñó una capa de asignación combinatoria entre una GPC estructurada y una
+futura canalización de datos clínicos sintéticos. Las dos particiones del grafo
+son entradas de un catálogo finito de estructuras de caso todavía no narradas y
+variantes clínicas de ruta completas,
+canónicas y trazables. Una arista existe solo si se demuestra una instancia de
+la estructura cuya ejecución recorre exactamente la ruta. El matching máximo
+reserva pares uno-a-uno y produce **assignment_manifest.json**.
 
-El grafo final contiene 75 escenarios, 35 objetivos y 267 aristas. Dos implementaciones propias —DFS por caminos aumentantes y Hopcroft–Karp— obtienen cardinalidad 33 y coinciden con NetworkX. Dos testigos de Hall explican la imposibilidad de cubrir 35 objetivos: un objetivo aislado y un cuello de ocho objetivos con siete escenarios vecinos. La cobertura combinatoria es 94,3 %. El software supera lint, tipado y 29 pruebas, incluido el universo de 689 grafos etiquetados con particiones de hasta tres vértices.
+La instancia KISS utiliza siete estructuras, ocho rutas y catorce aristas. Las
+rutas comprenden siete trayectorias con un criterio de severidad focal y una
+trayectoria sin severidad. Cada estructura puede instanciar su ruta focal o la
+ruta común sin severidad. El baseline por caminos aumentantes y Hopcroft-Karp
+obtienen cardinalidad siete. La cota por \(|U|\) y el testigo de Hall
+\(8>7\) certifican que no pueden asignarse las ocho rutas sin reutilización.
 
-## Introducción
+## Problema
 
-Los pipelines de integración pueden producir grandes inventarios de elementos estructurados sin una garantía automática de diversidad o cobertura. Seleccionar manualmente ejemplos es difícil de auditar; usar similitud semántica sin controles puede introducir relaciones no sustentadas. El matching bipartito permite formalizar una asignación uno-a-uno entre escenarios candidatos y obligaciones de cobertura.
+Una GPC computable puede enumerar rutas, pero eso no implica que exista una
+estructura independiente capaz de generar cada una. Generar narrativas primero
+y revisar después desplaza errores lógicos hacia una etapa costosa. El proyecto
+interpone una auditoría previa:
 
-La aplicación es deliberadamente no clínica. Los términos de la guía se tratan como datos estructurados para estudiar algoritmos, trazabilidad y reproducibilidad.
+1. formalizar rutas;
+2. definir estructuras permitidas;
+3. demostrar compatibilidades;
+4. optimizar la asignación;
+5. registrar la brecha antes de generar.
 
-## Objetivo
+## Pregunta y objetivo
 
-Maximizar el número de objetivos de cobertura que reciben un escenario distinto y compatible, preservando fuente, reglas y explicación para cada arista.
+> ¿Cómo asignar un catálogo finito de estructuras de caso clínico a variantes
+> clínicas de ruta de una GPC para maximizar el número de asignaciones válidas
+> uno-a-uno antes de generar casos sintéticos?
 
-## Métodos
+El objetivo es construir \(B=(U,V,E)\), calcular un matching máximo y producir
+un manifiesto trazable con pares, testigos y rutas no asignadas.
 
-### Datos
+## Hipótesis
 
-Se auditaron cinco agregados canónicos y tres archivos Phase 4. Los hashes y conteos coinciden con el baseline. `flowcharts.json` es autoridad topológica; Phase 4 se usa como derivado reconciliado y se filtra por `source_id` exacto.
+Si las estructuras y rutas son válidas y cada arista se prueba por ejecución,
+Hopcroft-Karp devolverá el máximo número de pares independientes y los déficits
+de Hall identificarán falta de capacidad estructural.
 
-### Modelado
+## Material
 
-El grafo `D` conserva decisiones y alcanzabilidad. De él y de criterios explícitos se obtienen cinco firmas. Las reglas combinatorias generan `U`; los criterios, recomendaciones/BPC y resultados de decisión generan `V`. La compatibilidad exige predicados, acciones, estado, guía y procedencia.
+Se trabaja con una sola GPC de hipertensión en el embarazo, congelada en el
+pipeline privado. La demostración pública reemplaza textos e identificadores
+clínicos por IDs simbólicos, pero conserva la topología \(7-8-14\).
 
-### Algoritmos
+No se mezclan otras guías ni conocimiento médico externo.
 
-Se implementaron desde cero un baseline DFS y Hopcroft–Karp. La teoría principal procede de CLRS, capítulo 25. NetworkX se reserva como oráculo.
+## Formulación
 
-### Validación
+\[
+\max |M|,\qquad M\subseteq E,
+\]
 
-Se usaron pruebas unitarias, exhaustivas, de procedencia e integración; reconciliación de fuente; cardinalidad de oráculo; testigos de Hall; y microbenchmarks deterministas con 21 repeticiones.
+con grados en \(M\) no mayores que uno para todo vértice de \(U\cup V\).
+La compatibilidad se define por:
 
-## Resultados
+\[
+(u,v)\in E
+\iff
+\exists x\in\operatorname{Inst}(u):
+\operatorname{Exec}_D(x)=v.
+\]
 
-| Etapa | Resultado |
+## Fundamento algorítmico
+
+La fuente principal es CLRS, cuarta edición, capítulo 25. Un camino aumentante
+permite sustituir \(M\) por \(M\oplus P\) y aumentar su tamaño en uno. La
+ausencia de caminos aumentantes caracteriza un matching máximo. Hopcroft-Karp
+procesa por fase un conjunto maximal de caminos aumentantes mínimos disjuntos y
+alcanza \(O(|E|\sqrt{|V_B|})\).
+
+El proyecto no usa matrimonio estable: no existen rankings bilaterales. Tampoco
+usa matching ponderado: la versión KISS optimiza cardinalidad.
+
+## Resultado
+
+| Métrica | Valor |
 |---|---:|
-| flujos reconciliados | 3/3 |
-| firmas de ejecución | 5 |
-| criterios de riesgo | 22 |
-| criterios de severidad | 7 |
-| escenarios | 75 |
-| objetivos | 35 |
-| decisiones de pares | 2.625 |
-| compatibilidades aprobadas | 267 |
-| compatibilidades rechazadas | 2.358 |
-| matching máximo | 33 |
+| \(|U|\) | 7 |
+| \(|V|\) | 8 |
+| \(|E|\) | 14 |
+| \(|M^*|\) | 7 |
+| déficit de Hall | 1 |
 
-El objetivo `rec_3` está aislado por ausencia de acción explícita compatible. El segundo déficit proviene de ocho objetivos con solo siete escenarios vecinos. La optimalidad se certifica por solución factible de 33 y cota superior de 33.
+La optimalidad se demuestra por una solución factible de siete y una cota
+superior de siete. Para todas las rutas \(S=V\), \(N(S)=U\), por lo que
+\(|S|>|N(S)|\).
 
-En el demo, las medianas de tiempo son aproximadamente 154 μs para DFS y 150 μs para Hopcroft–Karp. En el fixture escalera `k=512`, las medianas son aproximadamente 38,0 ms y 0,55 ms, respectivamente. La instrumentación confirma el mecanismo: 262.144 frente a 2.046 escaneos.
+## Producto operativo
 
-## Discusión
+El matching se transforma en **assignment_manifest.json**, que especifica:
 
-El hallazgo principal no es una cifra clínica, sino una distinción algorítmica: alta conectividad local no garantiza cobertura perfecta bajo unicidad. El grupo de severidad tiene aristas, pero posee déficit colectivo. Esto muestra por qué los grados individuales y la inspección visual no sustituyen un matching máximo ni un análisis de Hall.
+- qué estructura queda reservada para qué ruta;
+- qué valores testigo producen la ruta;
+- qué restricciones no pueden alterarse;
+- qué fuente y versión sustentan la asignación;
+- qué ruta queda libre;
+- qué validaciones se han completado.
 
-La ausencia de arista de `rec_3` muestra el valor de la política conservadora: una afirmación no se completa por conocimiento externo. El pipeline conserva la brecha como resultado auditable.
+La selección concreta no es única. Cualquier matching de cardinalidad siete es
+óptimo, pero un solver no ponderado no expresa prioridad clínica.
 
-La comparación experimental concuerda con la teoría sin sobreinterpretarla. En instancias pequeñas, la complejidad asintótica no necesariamente produce una diferencia temporal observable. Un fixture controlado permite aislar el patrón de revisitas del baseline.
+## Aporte
+
+El aporte no es un nuevo algoritmo. Es una aplicación trazable de teoría
+clásica a una interfaz poco documentada: entre la formalización de una GPC y la
+generación sintética. El grafo permite detectar antes de generar:
+
+- rutas sin estructura compatible;
+- competencia colectiva por estructuras;
+- capacidad insuficiente;
+- necesidad de ampliar estructuras o cambiar de modelo.
+
+## Validez
+
+### Demostrado
+
+- correctitud algorítmica de la asignación para el grafo fijado;
+- cardinalidad óptima y déficit;
+- reproducibilidad de la demo pública;
+- separación entre fuente, compatibilidad y solver.
+
+### Pendiente
+
+- revisión clínica independiente de rutas, estructuras y testigos;
+- validación de la reconstrucción completa contra la fuente privada;
+- generación y evaluación de instancias;
+- fidelidad distribucional, diversidad, privacidad y utilidad analítica;
+- transportabilidad a otra GPC.
+
+## Relación con la literatura
+
+Peleg et al. y GLIF3 sustentan las representaciones computables de guías.
+Synthea muestra que GPC y máquinas de estados pueden alimentar generación de
+pacientes sintéticos, pero también que procedencia no garantiza realismo.
+CPGPrompt aporta un antecedente reciente para traducir guías a árboles
+ejecutables. CLRS y Hopcroft-Karp proporcionan la teoría de asignación.
+
+La búsqueda dirigida no identificó la cadena exacta GPC → rutas → estructuras
+de caso → compatibilidad demostrable → matching → manifiesto. Esta ausencia es
+una observación del alcance revisado, no una afirmación de prioridad mundial.
+
+## Limitaciones
+
+- una sola GPC;
+- topología KISS pequeña y preespecificada;
+- estructuras y variantes públicas simbólicas;
+- capacidades unitarias deliberadas;
+- ausencia de pesos clínicos;
+- datos sintéticos todavía no generados;
+- validez condicionada a la exactitud de las aristas.
 
 ## Conclusión
 
-El proyecto cumple el objetivo de convertir una fuente estructurada fijada por hash en un problema de matching bien definido, resolverlo con algoritmos propios, certificar su óptimo y explicar las brechas. La arquitectura separa semántica, integración y solver; los resultados son reproducibles y su interpretación está limitada a cobertura educativa.
-
-## Disponibilidad
-
-El repositorio contiene código, pruebas, notebook Colab, documentación, matriz de evidencia, benchmarks y presentación. La fuente local no se incluye; debe configurarse mediante `BIPARTITE_MINSA_SOURCE_ROOT` y superar la validación de hashes.
+Siete estructuras independientes pueden reservarse para siete de ocho rutas. El
+déficit se conoce antes de generar un solo paciente sintético. Esta es la
+utilidad del proyecto: convertir una brecha potencialmente oculta en una
+propiedad combinatoria reproducible, explicable y accionable.

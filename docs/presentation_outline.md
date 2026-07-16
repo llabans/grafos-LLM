@@ -1,156 +1,208 @@
-# Guion de presentación KISS — 15 minutos
+# Guion de presentación KISS: 15 minutos
 
-## Trabajo de comunicación
+## Resultado que debe comprender la audiencia
 
-Al terminar, los compañeros deben comprender que un grafo bipartito puede
-asignar casos distintos a objetivos distintos, demostrar la cobertura máxima y
-convertir una brecha curricular en una decisión de diseño.
+Un grafo bipartito puede auditar la capacidad de un catálogo de estructuras de
+caso clínico antes de generar datos sintéticos. El algoritmo produce un
+manifiesto óptimo y explica la brecha, pero no valida pacientes.
 
-## Narrativa principal
+## Distribución temporal
 
-| # | Tiempo | Título | Trabajo de la diapositiva | Evidencia |
-|---:|---:|---|---|---|
-| 1 | 0:50 | Siete casos para ocho objetivos: ¿alcanza? | presentar tensión, pregunta, GOAL y límite no clínico | GPC + pregunta |
-| 2 | 1:25 | Los casos y los objetivos forman dos grupos | definir `U`, `V` y una arista | subgrafo KISS |
-| 3 | 1:25 | Cada caso se asigna una sola vez | matching, máximo vs. maximal y restricciones | CLRS cap. 25 |
-| 4 | 1:35 | Reasignar puede aumentar la cobertura | mostrar un camino aumentante de 1 a 2 pares | Berge/CLRS |
-| 5 | 1:35 | Hopcroft-Karp encuentra varios aumentos por fase | BFS, DFS admisible y `O(E√V)` | CLRS/HK 1973 |
-| 6 | 2:25 | Siete casos no pueden cubrir ocho objetivos uno-a-uno | visualizar `7/8/14`, matching 7 y Hall `8>7` | código + fuente |
-| 7 | 2:05 | El Colab reproduce el óptimo: `M*=7` | ejecutar demo autónomo y dos solvers | tests/reporte |
-| 8 | 1:50 | El grafo convierte una brecha en una decisión educativa | añadir un caso o cambiar de modelo; conectar literatura | síntesis científica |
-| 9 | 1:10 | El resultado es estructural, no clínico | resolver la pregunta, estado de validez y referencias | matriz de validez |
-|  | **14:20** |  | 40 segundos de contingencia |  |
+| # | Tiempo | Título del PPT | Propósito |
+|---:|---:|---|---|
+| 1 | 0:50 | Siete estructuras. Ocho variantes. | tensión, pregunta y GOAL |
+| 2 | 1:35 | El grafo trabaja antes de crear pacientes sintéticos | distinguir el grafo clínico dirigido del bipartito |
+| 3 | 1:35 | Cada estructura se reserva para una sola variante | formalizar (U,V,E), capacidad y objetivo |
+| 4 | 1:40 | Reasignar una estructura puede abrir otra variante | explicar camino aumentante y optimalidad |
+| 5 | 1:40 | Hopcroft-Karp agrupa aumentos mínimos por fase | algoritmo y complejidad CLRS |
+| 6 | 2:15 | Siete estructuras no asignan ocho variantes uno a uno | mostrar resultado, cotas y Hall |
+| 7 | 1:55 | El Colab reproduce el óptimo y sus testigos | código, pruebas y manifiesto |
+| 8 | 1:55 | El matching es una compuerta, no un generador | ubicar la contribución y sus límites |
+| 9 | 1:05 | Siete estructuras asignan como máximo siete variantes | responder, cerrar y señalar la siguiente fase |
+|  | **14:30** |  | **0:30 de contingencia hasta 15:00** |
 
-## Contenido visible por diapositiva
+## Diapositiva 1. Siete estructuras. Ocho variantes.
 
-### 1. Siete casos para ocho objetivos: ¿alcanza?
+Pregunta oral:
 
-- Pregunta oral: “Tenemos 7 casos y 8 objetivos. ¿Cómo cubrir tantos como sea
-  posible sin reutilizar un caso?”
-- GOAL: maximizar objetivos distintos representados por casos distintos.
-- Alcance: diseño educativo derivado de una GPC; no decisiones sobre pacientes.
+> Antes de generar datos sintéticos, ¿cuántas variantes clínicas pueden recibir
+> una estructura compatible y exclusiva?
 
-### 2. Los casos y los objetivos forman dos grupos
+GOAL:
 
-- Izquierda `U`: casos `C1...C7`.
-- Derecha `V`: objetivos `O1...O7` y `O_BPC`.
-- Arista: el caso puede ser representante principal del objetivo bajo la regla.
-- Frase clave: “compatible” no significa “clínicamente validado”.
+> Maximizar variantes representadas con estructuras distintas y emitir
+> assignment_manifest.json.
 
-### 3. Cada caso se asigna una sola vez
+Aclaración inmediata: todavía no hay pacientes, narrativas ni registros
+sintéticos completos.
+
+## Diapositiva 2. El grafo trabaja antes de crear pacientes
+
+- (D), grafo dirigido: decide qué trayectoria ejecuta una asignación de
+  valores.
+- (B), grafo bipartito: decide qué estructura puede reservarse para qué
+  variante.
+- (U): variables, dominios, restricciones, missingness y procedencia.
+- (V): variante identificada por ruta y firma de predicados.
+- (E): compatibilidad con witness_assignment reejecutable.
+
+Mensaje: una transición clínica y una arista de compatibilidad responden
+preguntas distintas.
+
+## Diapositiva 3. Reserva uno-a-uno
+
+Presentar:
 
 \[
-\max\sum_{(u,v)\in E}x_{uv}
+\max \sum_{(u,v)\in E}x_{uv}
 \]
 
-con restricciones de grado seleccionadas `≤1` en ambos lados.
+sujeto a:
 
-- matching: asignación válida;
-- maximal: no puede añadirse una arista localmente;
-- máximo: tiene cardinalidad global óptima.
+\[
+\sum_v x_{uv}\leq1\quad\forall u,
+\qquad
+\sum_u x_{uv}\leq1\quad\forall v.
+\]
 
-### 4. Reasignar puede aumentar la cobertura
+La capacidad uno pertenece al lote piloto. La firma canónica bloquea clones
+obtenidos cambiando solo un ID. Matching máximo no significa matching maximal.
 
-Mostrar un ejemplo de dos casos y dos objetivos:
+## Diapositiva 4. Camino aumentante
 
-```text
-antes:   C1—O1       C2 libre, O2 libre
-camino:  C2—O1—C1—O2
-después: C2—O1       C1—O2
-```
+Recorrer el ejemplo:
 
-La diferencia simétrica aumenta `|M|` en uno.
+\[
+E_2-V_1-E_1-V_2.
+\]
 
-### 5. Hopcroft-Karp encuentra varios aumentos por fase
+- alterna aristas que no están y que sí están en (M);
+- comienza y termina en vértices libres;
+- (M'=M\oplus P) aumenta la cardinalidad en uno.
 
-1. BFS construye capas de caminos aumentantes mínimos.
-2. DFS usa solo aristas admisibles.
-3. Se aplican caminos disjuntos en la misma fase.
+Base CLRS:
 
-Complejidad: `O(E√V)`; espacio `O(V+E)`.
+- Lema 25.1: la diferencia simétrica conserva matching y suma uno;
+- Corolario 25.4: (M) es máximo si y solo si no existe camino aumentante.
 
-### 6. Siete casos no pueden cubrir ocho objetivos uno-a-uno
+## Diapositiva 5. Hopcroft-Karp
 
-Visual central:
+1. BFS construye capas de distancia mínima.
+2. DFS busca caminos aumentantes admisibles y disjuntos.
+3. La fase aumenta todos los encontrados.
+4. Se repite hasta no encontrar otro camino aumentante.
 
-- siete casos abreviados: PA, plaquetas, hígado, riñón, pulmón,
-  neuro/visual, útero-placentario;
-- ocho objetivos: siete criterios + BPC;
-- cada caso se conecta con su objetivo y con BPC;
-- siete aristas de matching resaltadas;
-- un objetivo sin representante.
+\[
+T_{\mathrm{HK}}=O(m\sqrt n),
+\qquad
+T_{\mathrm{implementación}}=O(n+m\sqrt n).
+\]
 
-Prueba:
+El costo completo del pipeline también incluye derivación de variantes,
+construcción de estructuras y materialización de (E).
 
-```text
-|U|=7 |V|=8 |E|=14 |M*|=7
-Hall: |S|=8 > |N(S)|=7
-```
+## Diapositiva 6. Resultado y prueba
 
-### 7. El Colab reproduce el óptimo: `M*=7`
+\[
+|U|=7,\quad|V|=8,\quad|E|=14,\quad|M^*|=7.
+\]
 
-Código visible máximo de 8 a 10 líneas y salida:
+- cota inferior: se exhiben siete pares factibles;
+- cota superior: solo existen siete estructuras-cupo;
+- Hall: para (S=V), (|S|=8>|N(S)|=7), déficit uno.
 
-```text
-PASS |U|=7 |V|=8 |E|=14 |M*|=7
-agreement dfs=7 hopcroft_karp=7
-```
+Hall explica por qué una variante queda libre, pero no cuál es menos importante
+clínicamente.
 
-LOOP en notas: definir → construir → resolver → verificar → interpretar →
-repetir.
+## Diapositiva 7. Código y Colab
 
-### 8. El grafo convierte una brecha en una decisión educativa
+La demo muestra únicamente:
 
-- Opción A: añadir un octavo caso independiente.
-- Opción B: permitir varios objetivos por caso y usar otro modelo.
-- Literatura: las GPC ya se modelan como grafos y las simulaciones escalan la
-  práctica; esta propuesta añade una capa de curación óptima y explicable.
-- Novedad calibrada: combinación potencialmente poco explorada; validación
-  experta pendiente.
+1. construcción determinista de (B);
+2. catorce aristas con testigo;
+3. DFS aumentante (=7);
+4. Hopcroft-Karp (=7);
+5. NetworkX (=7) como oráculo independiente;
+6. testigo de Hall y assignment_manifest.json.
 
-### 9. El resultado es estructural, no clínico
+La fuente clínica privada no se expone.
 
-Respuesta final:
+## Diapositiva 8. Compuerta previa a síntesis
 
-> Siete casos cubren como máximo siete de ocho microobjetivos bajo unicidad; el
-> grafo demuestra la brecha y orienta una acción de diseño.
+Cadena fundamentada:
+
+- Peleg y GLIF3: GPC computables;
+- Synthea: mapas clínicos y máquinas de estados;
+- CPGPrompt: guía a árbol ejecutable y dificultad en rutas finas;
+- CLRS: asignación bipartita óptima.
+
+Contribución calibrada:
+
+> El proyecto inserta una compuerta combinatoria auditable antes de instanciar
+> o narrar. La búsqueda dirigida no identificó la integración exacta completa;
+> esto no demuestra prioridad mundial.
+
+Separar validez algorítmica, estructural, clínica y generativa.
+
+## Diapositiva 9. Respuesta y cierre
+
+> Con siete estructuras-cupo pueden asignarse como máximo siete de ocho
+> variantes. La salida es un manifiesto pre-generativo con pares, testigos,
+> procedencia y la variante no asignada.
 
 Estado:
 
-- algoritmo: validado;
-- fundamento científico: documentado;
-- contenido clínico y efecto educativo: por validar prospectivamente.
+- demostrado: matching, cardinalidad y Hall;
+- fundamentado: GPC computables y simulación por estados;
+- pendiente: revisión clínica experta y validez generativa, temporal y
+  estadística.
 
-Referencias visibles mínimas: CLRS cap. 25; Hopcroft y Karp (1973); Kandula y
-Bhattacharyya (2023); Gupta et al. (2025); MedSimAI (2025/2026).
-
-## Demo funcional
-
-```bash
-python scripts/run_kiss_severity_case.py
-```
-
-El notebook `notebooks/research_var_cases_kiss.ipynb` no requiere subir el ZIP.
-El pipeline completo queda en anexo.
+Siguiente paso: revisar contenido con panel clínico, instanciar un lote piloto y
+validarlo antes de narrar.
 
 ## Preguntas probables
 
-- **¿Por qué 7 es máximo?** Hay solución de 7 y solo existen 7 casos; Hall da
-  `8>7`.
-- **¿Cuál objetivo queda fuera?** El matching no ponderado no prioriza; cualquier
-  óptimo puede dejar uno distinto.
-- **¿Un caso no puede enseñar dos cosas?** Sí. La unicidad es una política para
-  representantes independientes; sin ella usaríamos cobertura o `b`-matching.
-- **¿La GPC trae objetivos de aprendizaje?** No. Son microobjetivos diseñados y
-  deben validarse por expertos.
-- **¿Está clínicamente validado?** No. Está validado como algoritmo y tiene un
-  protocolo prospectivo de contenido y utilidad educativa.
-- **¿Es novedoso?** La combinación exacta no apareció en la revisión dirigida;
-  se presenta como potencialmente novedosa, no como “primera mundial”.
+### ¿Por qué no generar directamente?
+
+Porque una narración fluida puede incumplir la lógica de la ruta. La compuerta
+previa detecta falta de capacidad o contradicción de forma más barata y
+auditable.
+
+### ¿Por qué matching?
+
+Porque el lote exige una estructura independiente por variante y capacidad
+uno. Si se permite reutilización, cambia el modelo: por ejemplo, (b)-matching
+o cobertura de conjuntos según la pregunta.
+
+### ¿Por qué siete es máximo?
+
+Existe un matching de siete y (|U|=7) es una cota superior. El Corolario 25.4
+certifica el solver; Hall explica la imposibilidad de saturar las ocho
+variantes.
+
+### ¿Cuál variante queda fuera?
+
+El modelo no ponderado no expresa prioridad clínica; distintas soluciones
+óptimas pueden dejar libre una variante diferente.
+
+### ¿La estructura es reutilizable?
+
+El tipo de software podría reutilizarse. En este modelo, cada (u\in U)
+representa un cupo concreto del catálogo piloto y declara capacidad uno.
+
+### ¿Está clínicamente validado?
+
+No completamente. Solver, topología y testigos se verificaron; rutas,
+restricciones y contenido de los testigos requieren revisión experta
+independiente.
+
+### ¿Es pionero?
+
+Es una integración potencialmente novedosa según una búsqueda dirigida, no una
+afirmación de prioridad mundial.
 
 ## Corte si falta tiempo
 
-1. En la diapositiva 4, explicar una sola inversión del camino.
-2. En la diapositiva 5, decir la cota sin derivarla.
-3. En la diapositiva 8, mostrar solo dos antecedentes y remitir al informe.
-4. Proteger la diapositiva 6 y la conclusión.
+- reducir el ejemplo del camino aumentante a una sola reasignación;
+- mencionar, sin derivar, la cota de Hopcroft-Karp;
+- conservar completas las diapositivas 2, 6, 7 y 9.

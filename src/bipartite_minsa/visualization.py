@@ -35,11 +35,11 @@ def bipartite_matching_dot(graph: BipartiteGraph, result: MatchingResult) -> str
     lines = [
         "graph coverage {",
         "  rankdir=LR;",
-        '  subgraph cluster_left { label="U: escenarios"; color=lightgrey;',
+        '  subgraph cluster_left { label="U: estructuras de caso"; color=lightgrey;',
     ]
     lines.extend(f"    {_quote(left_id)} [shape=circle];" for left_id in graph.left)
     lines.append("  }")
-    lines.append('  subgraph cluster_right { label="V: objetivos"; color=lightgrey;')
+    lines.append('  subgraph cluster_right { label="V: rutas clínicas"; color=lightgrey;')
     lines.extend(f"    {_quote(right_id)} [shape=box];" for right_id in graph.right)
     lines.append("  }")
     for edge in graph.edges:

@@ -1,4 +1,4 @@
-"""Certificados estructurales para objetivos no cubiertos."""
+"""Certificados de Hall para rutas clínicas sin estructura asignada."""
 
 from __future__ import annotations
 
@@ -12,11 +12,11 @@ from bipartite_minsa.matching.result import MatchingResult
 
 @dataclass(frozen=True, slots=True)
 class HallDeficiencyWitness:
-    """Conjunto ``S`` de objetivos con ``|S| > |N(S)|``."""
+    """Conjunto ``S`` de rutas con ``|S| > |N(S)|``."""
 
-    root_unmatched_target: str
-    target_ids: tuple[str, ...]
-    neighboring_scenario_ids: tuple[str, ...]
+    root_unmatched_route: str
+    clinical_route_variant_ids: tuple[str, ...]
+    neighboring_case_structure_ids: tuple[str, ...]
     deficiency: int
     mechanism: str
 
@@ -27,7 +27,7 @@ def hall_deficiency_witnesses(
 ) -> tuple[HallDeficiencyWitness, ...]:
     """Extrae testigos de Hall mediante alcanzabilidad alternante desde ``V``.
 
-    El procedimiento presupone un matching máximo. Si un objetivo libre no
+    El procedimiento presupone un matching máximo. Si una ruta libre no
     induce déficit positivo, se rechaza el resultado porque existiría un camino
     aumentante o el matching sería inconsistente.
     """
@@ -59,23 +59,23 @@ def hall_deficiency_witnesses(
                     seen_right.add(matched_target)
                     queue.append(("right", matched_target))
 
-        target_ids = tuple(sorted(seen_right))
-        scenario_ids = tuple(sorted(seen_left))
-        deficiency = len(target_ids) - len(scenario_ids)
+        route_ids = tuple(sorted(seen_right))
+        case_structure_ids = tuple(sorted(seen_left))
+        deficiency = len(route_ids) - len(case_structure_ids)
         if deficiency <= 0:
             raise GraphValidationError(
-                "el objetivo libre no genera testigo de Hall; verifique maximalidad del matching"
+                "la ruta libre no genera testigo de Hall; verifique maximalidad del matching"
             )
-        mechanism = "isolated_evidence_gap" if not scenario_ids else "capacity_bottleneck"
-        key = (target_ids, scenario_ids)
+        mechanism = "isolated_evidence_gap" if not case_structure_ids else "capacity_bottleneck"
+        key = (route_ids, case_structure_ids)
         witnesses.setdefault(
             key,
             HallDeficiencyWitness(
-                root_unmatched_target=root,
-                target_ids=target_ids,
-                neighboring_scenario_ids=scenario_ids,
+                root_unmatched_route=root,
+                clinical_route_variant_ids=route_ids,
+                neighboring_case_structure_ids=case_structure_ids,
                 deficiency=deficiency,
                 mechanism=mechanism,
             ),
         )
-    return tuple(sorted(witnesses.values(), key=lambda item: item.root_unmatched_target))
+    return tuple(sorted(witnesses.values(), key=lambda item: item.root_unmatched_route))

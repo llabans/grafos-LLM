@@ -1,280 +1,318 @@
-# Explicación para una estudiante de maestría en ingeniería estadística
+# Explicación conceptual para medicina, epidemiología e ingeniería estadística
 
-## Punto de partida desde medicina y epidemiología
+## La idea en una frase
 
-Piensa en este proyecto como una cadena de **definición operacional → control de datos → optimización → validación**. Ese flujo es familiar en epidemiología: antes de estimar una asociación se define la población, exposición, desenlace y reglas de inclusión. Aquí no estimamos una asociación; definimos dos conjuntos de objetos y preguntamos cuántas asignaciones uno-a-uno pueden hacerse sin violar compatibilidad.
+Antes de generar pacientes sintéticos, verificamos si disponemos de suficientes
+estructuras independientes para representar las variantes clínicas de una GPC.
 
-La semejanza útil está en la disciplina de diseño. La diferencia crucial está en el objeto:
+## Analogía con un protocolo epidemiológico
 
-| En epidemiología | En este proyecto |
+Imagina que planeas un estudio:
+
+1. defines estados clínicos y criterios;
+2. diseñas una ficha de recolección;
+3. verificas que la ficha pueda representar cada estrato relevante;
+4. recién después recolectas o simulas observaciones.
+
+Generar datos antes del paso 3 sería como iniciar trabajo de campo y descubrir
+al final que el instrumento no podía registrar una categoría importante.
+
+En el proyecto:
+
+| Epidemiología | Proyecto |
 |---|---|
-| personas/unidades observacionales | escenarios simbólicos generados por reglas |
-| variable de desenlace | obligación estructural de cobertura |
-| criterio de elegibilidad | predicados y acciones requeridos |
-| diccionario de datos | dataclasses y contratos de adaptador |
-| diagrama causal o flujo clínico | grafo dirigido `D` |
-| asignación combinatoria | grafo bipartito `B` y matching |
-| auditoría de linaje | `SourceReference` + SHA-256 |
+| protocolo clínico | GPC congelada |
+| diagrama de estados | grafo dirigido \(D\) |
+| estrato o trayectoria que se quiere representar | ClinicalRouteVariant |
+| ficha parametrizable | estructura de caso clínico |
+| verificación de elegibilidad | witness_assignment |
+| plan de observaciones | assignment_manifest.json |
+| base de datos | generación sintética futura |
 
-No son equivalentes, pero el paralelo ayuda a ubicar cada responsabilidad.
+La analogía ayuda, pero no es identidad: el matching no estima un efecto ni una
+prevalencia.
 
-## La confusión más probable: “matching” no significa propensity-score matching
+## Tres niveles
 
-En epidemiología, *matching* suele seleccionar sujetos comparables para controlar confusión. Se habla de distancia, caliper, balance de covariables y estimandos causales. Nada de eso ocurre aquí.
+### 1. Estructura de caso clínico
 
-En teoría de grafos, un matching es un subconjunto de aristas que no comparte endpoints. Si `u` representa un escenario y `v` un objetivo, elegir `(u,v)` consume ambos: ese escenario y ese objetivo no pueden aparecer en otro par.
+Es un esquema con variables y reglas:
+
+- qué variables existen;
+- qué valores pueden tomar;
+- qué combinaciones son obligatorias o prohibidas;
+- qué datos pueden faltar;
+- qué estado inicial corresponde;
+- de qué parte de la GPC proviene.
+
+Todavía no hay una paciente concreta.
+
+### 2. Instancia
+
+Se asignan valores:
+
+\[
+c_1=1,\quad c_2=\cdots=c_7=0.
+\]
+
+La combinación determina una trayectoria sobre el grafo.
+
+### 3. Registro sintético
+
+Se realiza la instancia como texto, tabla o secuencia temporal. Este nivel no se
+produce en el proyecto actual.
+
+## La pregunta
+
+> ¿Cómo asignar un catálogo finito de estructuras de caso clínico a variantes
+> clínicas de ruta de una GPC, maximizando pares válidos uno-a-uno antes de
+> generar datos sintéticos?
+
+### “Catálogo finito”
+
+No hablamos de una clase de software reutilizable infinitamente. Para el lote
+piloto existen siete entradas disponibles y cada una tiene capacidad uno en el
+manifiesto.
+
+### “Variantes clínicas de ruta”
+
+Una variante es una trayectoria completa y canónica:
+
+    entrada → condición → decisión XOR → rama → terminal
+
+Incluye predicados requeridos y prohibidos. Dos objetos con IDs distintos pero
+la misma canonical_signature cuentan una sola vez.
+
+### “Uno a uno”
+
+Cada entrada del catálogo se reserva para una variante y cada variante recibe a
+lo sumo una entrada:
+
+\[
+\sum_v x_{uv}\leq1,\qquad
+\sum_u x_{uv}\leq1.
+\]
+
+Esta regla convierte el problema en matching bipartito.
+
+## Dos grafos diferentes
+
+### Grafo dirigido \(D\)
+
+Responde:
+
+> ¿Qué trayectoria sigue una combinación clínica?
+
+Sus aristas significan transición o decisión.
+
+### Grafo bipartito \(B\)
+
+Responde:
+
+> ¿Qué estructura puede representar qué variante?
+
+Sus aristas significan compatibilidad demostrable.
+
+Mezclar ambos grafos sería como mezclar el diagrama causal con la matriz que
+asigna sujetos a estratos: cumplen funciones distintas.
+
+## Cómo se acepta una arista
+
+\[
+(u,v)\in E
+\iff
+\exists x\in\operatorname{Inst}(u):
+\operatorname{Exec}_D(x)=v.
+\]
+
+\(\operatorname{Exec}_D\) es parcial y determinista:
+
+- si falta un dato necesario, rechaza;
+- si hay contradicción, rechaza;
+- si se habilitan dos ramas XOR, rechaza;
+- si exactamente una rama puede seguirse hasta el terminal, devuelve la
+  variante.
+
+El \(x\) que demuestra la arista se guarda como witness_assignment. Decir que
+dos textos “se parecen” no basta.
+
+## Por qué las construcciones son independientes
+
+Primero se enumeran variantes desde \(D\). En paralelo se construyen
+estructuras desde el esquema de variables y restricciones. Después se prueban
+todos los pares.
+
+Si se construyera una estructura copiando cada variante, cada una tendría
+garantizada su pareja y el grafo sería circular y trivial.
+
+## La demo KISS
+
+\[
+U=\{S_1,\ldots,S_7\}
+\]
+
+\[
+V=\{R_1,\ldots,R_7,R_0\}.
+\]
+
+- \(R_1,\ldots,R_7\): variantes con un criterio de severidad focal;
+- \(R_0\): variante sin criterios de severidad.
+
+Cada \(S_i\) puede producir:
+
+- \(R_i\), con su criterio focal presente y los demás controlados;
+- \(R_0\), con los siete ausentes.
 
 Por tanto:
 
-- no hay tratamiento ni control;
-- no se estima propensity score;
-- no se pretende intercambiabilidad;
-- no se calcula efecto causal;
-- no existen pacientes reales o sintéticos;
-- la palabra “máximo” se refiere a cardinalidad, no a beneficio clínico.
-
-## Dos grafos y por qué necesitamos ambos
-
-### Grafo dirigido `D=(N,A)`
-
-Es el equivalente a preservar el diagrama de proceso original. Las flechas tienen dirección y pueden expresar alternativas o secuencias. Sirve para responder:
-
-- ¿qué nodo inicia el flujo?;
-- ¿qué nodos son alcanzables?;
-- ¿cuáles son terminales alcanzables?;
-- ¿una bifurcación es `AND`, `XOR` o ambigua?;
-- ¿existe un nodo aislado?
-
-No se aplica Hopcroft–Karp sobre este grafo.
-
-### Grafo bipartito `B=(U,V,E_B)`
-
-Aquí las aristas no significan “sigue clínicamente a”. Significan “este escenario satisface esta obligación bajo la regla documentada”.
-
-- `U`: 75 escenarios simbólicos.
-- `V`: 35 obligaciones.
-- `E_B`: 267 compatibilidades demostradas.
-
-La bipartición es una restricción de tipos: no existe arista escenario–escenario ni objetivo–objetivo.
-
-## Del dato crudo al objeto estadístico-computacional
-
-La transformación se parece a preparar un dataset analítico:
-
-1. **Congelar la fuente.** Los hashes cumplen una función análoga a versionar la base exacta usada en un análisis.
-2. **Validar contratos.** Tipos, IDs y endpoints deben existir.
-3. **Reconciliar representaciones.** Se compara el flujograma primario con Phase 4 para no contar el mismo fenómeno dos veces.
-4. **Definir variables operacionales.** Los textos explícitos se normalizan a predicados con reglas auditables.
-5. **Generar unidades.** Los escenarios se producen por combinatoria declarada, no por narración libre.
-6. **Definir objetivos.** Se deduplican por concepto e ID.
-7. **Construir relaciones.** Cada par candidato se aprueba o rechaza con explicación.
-8. **Optimizar.** El solver opera únicamente sobre IDs y adyacencia.
-
-La regla “primero diseño, luego cálculo” es tan importante aquí como en un protocolo epidemiológico.
-
-## De dónde salen los 75 escenarios
-
-La aritmética es completamente reproducible:
-
 \[
-10 + \binom{11}{2} + 1 + 1 + 1 + 7
-=10+55+1+1+1+7=75.
+E=\{(S_i,R_i),(S_i,R_0):1\leq i\leq7\}
 \]
 
-- 10 escenarios usan individualmente cada factor de riesgo alto explícito.
-- 55 representan todos los pares no ordenados de 11 factores moderados.
-- 1 representa el perfil leve explícito.
-- 2 representan ramas estructurales de `flow_2` sin criterio de severidad.
-- 7 usan individualmente cada criterio de severidad explícito.
-
-No hay una “muestra” de 75 pacientes. Es el universo finito generado por esas reglas.
-
-## De dónde salen los 35 objetivos
+y:
 
 \[
-35=10+11+7+5+2.
+|U|=7,\quad|V|=8,\quad|E|=14.
 \]
 
-Son 10 factores altos, 11 moderados, 7 criterios de severidad, 5 recomendaciones/BPC y 2 resultados estructurales. El objetivo es cubrir tantos como sea posible con representantes distintos.
+## Qué hace el matching
 
-## Qué significa una arista
+Un matching selecciona aristas sin repetir extremos. La cantidad de pares es la
+cardinalidad \(|M|\).
 
-Supón que un objetivo requiere predicado `p` y acción `a`. Un escenario es compatible si:
+Un matching maximal puede quedar bloqueado localmente sin ser el mayor posible.
+Un matching máximo es el de mayor cardinalidad global.
 
-1. contiene todos los predicados requeridos;
-2. no contiene un predicado prohibido;
-3. activa todas las acciones esperadas;
-4. escenario y objetivo están validados;
-5. ambos pertenecen a la guía autorizada;
-6. existe procedencia verificable.
+## Camino aumentante
 
-Esto se parece a una regla de inclusión multivariable, pero no genera una probabilidad. La salida es binaria y determinista.
+Supón:
 
-Una ausencia de arista se lee:
+    S1 — R1 seleccionada
+    S2 libre
+    R2 libre
 
-> “No se demostró compatibilidad bajo esta versión de reglas y esta fuente”.
-
-No se lee “la conducta es incorrecta” ni “el caso no debe tratarse”.
-
-## Matching maximal, máximo y perfecto
-
-- **Maximal:** no puedes agregar una arista sin romper unicidad. Puede ser subóptimo.
-- **Máximo:** tiene la mayor cardinalidad global.
-- **Perfecto:** cubre todos los vértices de ambos lados; exige tamaños compatibles y suficiente conectividad.
-
-La analogía estadística sería distinguir un algoritmo que llegó a un punto donde no sabe mejorar de una solución certificada como óptima. “No puedo añadir localmente” no implica “alcancé el máximo global”.
-
-## Camino aumentante paso a paso
-
-Considera:
-
-- escenarios `u1,u2`;
-- objetivos `v1,v2`;
-- aristas `u1-v1`, `u1-v2`, `u2-v1`;
-- matching actual `M={u1-v1}`.
-
-`u2` está libre. No puede tomar `v1` directamente porque está ocupado. Pero existe el camino:
+Si existen las aristas \(S_2-R_1\) y \(S_1-R_2\), el camino:
 
 \[
-u2 - v1 - u1 - v2.
+S_2-R_1-S_1-R_2
 \]
 
-Las aristas alternan “fuera, dentro, fuera” del matching. Al invertir su estado:
+permite reasignar y aumentar de uno a dos pares. CLRS expresa el cambio mediante
+diferencia simétrica \(M\oplus P\).
+
+El Corolario 25.4 dice que un matching es máximo si y solo si no existe camino
+aumentante.
+
+## Hopcroft-Karp
+
+En lugar de aumentar un camino por vez:
+
+1. BFS encuentra la longitud mínima;
+2. DFS busca varios caminos mínimos disjuntos;
+3. se aplican juntos;
+4. se repite.
 
 \[
-M'={u2-v1,u1-v2},
+T_{\mathrm{HK}}=O(m\sqrt n).
 \]
 
-y la cardinalidad pasa de 1 a 2. La reasignación es la idea esencial del DFS aumentante y de Hopcroft–Karp.
+Para siete por ocho, el beneficio práctico es irrelevante. Se usa porque
+demuestra la teoría del curso y escala a catálogos mayores.
 
-## Qué añade Hopcroft–Karp
+## Resultado
 
-El baseline encuentra un camino por vez. Hopcroft–Karp usa BFS para identificar la longitud mínima de los aumentos disponibles y DFS para encontrar varios caminos disjuntos de esa longitud en una misma fase.
-
-Desde ingeniería estadística, puedes verlo como evitar trabajo redundante: BFS construye una estructura de admisibilidad global y DFS explota esa estructura antes de recalcularla.
-
-Con `n` vértices totales y `m` aristas:
-
-- DFS basal: `O(nm)` como cota general;
-- Hopcroft–Karp: `O(m√n)` sobre el grafo activo;
-- espacio de ambas implementaciones: `O(n+m)`.
-
-Como el software conserva aislados, el costo completo de Hopcroft–Karp se documenta como `O(n+m√n)`.
-
-## Por qué el resultado es 33 y no 35
-
-Hay dos razones distintas.
-
-### 1. Brecha de evidencia
-
-El objetivo asociado a `rec_3` tiene grado cero. Ningún escenario demuestra simultáneamente los requisitos y una acción explícita reconciliada. Formalmente:
+El algoritmo construye siete pares:
 
 \[
-|S|=1,\quad |N(S)|=0.
+|M^*|\geq7.
 \]
 
-### 2. Cuello de capacidad
-
-Siete escenarios de severidad deben representar ocho objetivos: siete criterios individuales y una BPC asociada. Cada escenario puede usarse una vez:
+Como solo hay siete estructuras:
 
 \[
-|S|=8,\quad |N(S)|=7.
+|M^*|\leq7.
 \]
 
-Por la condición de Hall, al menos uno de esos ocho objetivos quedará libre. Esto no es falta de una arista individual; es competencia colectiva por capacidad.
-
-Los dos déficits suman 2. Como hay 35 objetivos:
+Entonces:
 
 \[
-|M|\le35-2=33.
+|M^*|=7.
 \]
 
-El algoritmo encuentra 33, así que la solución alcanza la cota superior y es óptima.
+## Hall explicado clínicamente
 
-## Cómo interpretar 94,3 %
+Las ocho variantes dependen de un catálogo con siete entradas:
 
 \[
-\frac{33}{35}\times100=94,2857\%.
+|S|=8>|N(S)|=7.
 \]
 
-Es **cobertura combinatoria uno-a-uno**. No es:
+No existe forma de entregar una estructura independiente a cada variante. Hall
+formaliza esta insuficiencia.
 
-- accuracy;
-- sensibilidad o especificidad;
-- valor predictivo;
-- proporción de pacientes cubiertos;
-- adherencia a la guía;
-- calidad de atención.
+No dice cuál variante debe excluirse. Sin pesos, cualquier óptimo puede dejar
+una diferente.
 
-El denominador son obligaciones construidas, no individuos.
+## Qué contiene assignment_manifest.json
 
-## Lectura de los benchmarks
+- versión y hash de la GPC;
+- hash del grafo y reglas;
+- estructura reservada;
+- variante asignada;
+- witness_assignment;
+- restricciones invariantes;
+- variante libre;
+- déficit;
+- estados de validación.
 
-En el demo pequeño, DFS y Hopcroft–Karp tardan alrededor de 0,15 ms. No hay base para afirmar una superioridad temporal práctica con ese único grafo.
+Es equivalente a un plan de muestreo estructural, no a la muestra obtenida.
 
-En el fixture escalera de 512 vértices por lado:
+## Dónde está la ingeniería estadística
 
-- DFS: 262.144 escaneos y mediana ≈37,98 ms;
-- Hopcroft–Karp: 2.046 escaneos y mediana ≈0,55 ms.
-
-El fixture está construido para revelar la revisita cuadrática del baseline. Es equivalente a usar un caso de simulación con mecanismo conocido para comprobar que un estimador o algoritmo responde como predice la teoría. No describe la distribución de grafos clínicos.
-
-## ¿Dónde está la “estadística” en este proyecto?
-
-El núcleo es algorítmico, pero la ingeniería estadística aparece en:
-
-- especificación del objeto medido;
-- calidad, linaje y versionado de datos;
+- definición precisa de la unidad;
+- control de linaje y versiones;
 - prevención de leakage entre fuentes;
-- diseño de reglas reproducibles;
-- separación entre resultados deterministas y evidencia empírica;
-- resumen robusto de tiempos con mediana y cuartiles;
-- análisis de validez interna, de constructo y externa;
-- rechazo de inferencias no sustentadas.
+- separación entre estimando determinista e incertidumbre;
+- validación de constructo;
+- diseño prospectivo de métricas;
+- análisis de sensibilidad a reglas;
+- distinción entre fidelidad, utilidad y privacidad.
 
-Una buena defensa académica no necesita “forzar” una prueba estadística. Reconocer que los tiempos repetidos no constituyen una muestra inferencial es una decisión metodológica correcta.
+No se necesita forzar un valor p. Para un grafo fijo, \(|M^*|\) es exacto.
 
-## Cómo leer el código
+## Validez
 
-Orden recomendado:
+### Algorítmica
 
-1. `domain/`: vocabulario y contratos.
-2. `ingestion/`: cómo se fija y filtra la fuente.
-3. `validation/source_reconciliation.py`: cómo se protege la semántica de `D`.
-4. `integration/scenario_generator.py`: por qué `|U|=75`.
-5. `integration/coverage_target_builder.py`: por qué `|V|=35`.
-6. `integration/compatibility_builder.py`: por qué existe cada arista.
-7. `matching/augmenting_path.py`: baseline.
-8. `matching/hopcroft_karp.py`: algoritmo principal.
-9. `matching/analysis.py`: testigos de Hall.
-10. `tests/`: evidencia observable de cada invariante.
+¿El solver encuentra el óptimo?
 
-## Preguntas de defensa oral
+### Estructural
 
-### “¿Por qué no usar set cover?”
+¿Las variantes, estructuras, aristas y testigos son internamente consistentes?
 
-Porque el objetivo curricular exige una asignación uno-a-uno. *Set cover* permitiría que un escenario cubriera simultáneamente muchos objetivos y buscaría minimizar cuántos escenarios usar; es otro problema.
+### Clínica
 
-### “¿Por qué NetworkX si implementaste el algoritmo?”
+¿Representan fielmente la GPC según especialistas independientes?
 
-Como oráculo independiente. El demo ejecuta código propio; NetworkX verifica cardinalidad en pruebas y no reemplaza la implementación.
+### Generativa
 
-### “¿Por qué no completar `rec_3` con conocimiento médico?”
+¿Los datos posteriores son coherentes, diversos, útiles y privados?
 
-Porque eso rompería el gate de fuente. La ausencia es un resultado de auditoría, no un hueco que deba maquillarse.
+Una respuesta positiva no implica las demás.
 
-### “¿Por qué la BPC compite con criterios de severidad?”
+## Cuándo cambiar de modelo
 
-Porque matching consume un escenario por objetivo. Ese cuello muestra la diferencia entre compatibilidad múltiple y selección uno-a-uno.
+- una estructura cubre varias variantes: set cover;
+- capacidades mayores que uno: \(b\)-matching;
+- prioridades: matching ponderado;
+- cuotas o prevalencias: programación entera;
+- presupuesto fijo: maximum coverage.
 
-### “¿Qué prueba que 33 es máximo?”
+## Respuesta oral
 
-Tres capas: criterio de caminos aumentantes, concordancia entre solvers/oráculos y cota superior constructiva mediante dos testigos de Hall.
-
-### “¿Cuál es la principal amenaza a la validez?”
-
-La definición de compatibilidad: aunque su implementación sea exacta, una regla alternativa produciría otro grafo. Por eso está versionada, explicada y limitada al propósito educativo.
-
-## Mensaje final para la presentación
-
-El valor del proyecto no es que “un algoritmo leyó medicina”. Es que una cadena auditable transformó una fuente estructurada en un problema matemático bien definido, demostró el óptimo, explicó sus brechas y evitó inferencias clínicas indebidas.
+> Construimos las variantes desde el grafo de la GPC y, por separado, un
+> catálogo de estructuras. Una arista existe solo si una asignación concreta
+> ejecuta exactamente la variante. Hopcroft-Karp selecciona el mayor conjunto
+> uno-a-uno. Con siete estructuras y ocho variantes, el óptimo es siete y Hall
+> demuestra un déficit uno. El resultado es assignment_manifest.json, no un
+> paciente sintético.
