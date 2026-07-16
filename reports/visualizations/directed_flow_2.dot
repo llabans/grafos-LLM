@@ -1,0 +1,20 @@
+digraph clinical {
+  rankdir=LR;
+  node [shape=box];
+  "flow_2:n1" [label="flow_2:n1\\nContinuar CPN", style="solid"];
+  "flow_2:n2" [label="flow_2:n2\\nGestante con presión arterial elevada*", style="solid"];
+  "flow_2:n3" [label="flow_2:n3\\n¿Presenta al menos uno de los criterios de severidad?", style="solid"];
+  "flow_2:n4" [label="flow_2:n4\\nCriterios de severidad: 1. PAS ≥160 o PAD ≥110 mmHg. 2. Trombocitopenia (<100 000/microL). 3. Función hepática deteriorada (transaminasas ≥70 U/L). 4. Lesión renal aguda (creatinina >1.1 mg/dl u oliguria). 5. Edema pulmonar. 6. Trastornos cerebrales o visuales. 7. Disfunción útero placentaria.", style="solid"];
+  "flow_2:n5" [label="flow_2:n5\\nHipertensión gestacional o preeclampsia sin criterios de severidad", style="solid"];
+  "flow_2:n6" [label="flow_2:n6\\nPreeclampsia con criterios de severidad", style="solid"];
+  "flow_2:n7" [label="flow_2:n7\\nReferir a emergencia con vía aérea permeable y vía EV periférica. Realizar pruebas de laboratorio: hematocrito, hemoglobina, coagulación, grupo RH, urea, creatinina, plaquetas, glucosa.", style="solid"];
+  "flow_2:n8" [label="flow_2:n8\\nActivar CLAVE AZUL. Referencia de emergencia con vía aérea permeable, vía EV con CINA 9% y sonda Foley. Administrar sulfato de magnesio 10g (5 ampollas al 20%). Si convulsiones: sulfato de magnesio 2g EV o diazepam 10mg EV. Realizar pruebas de laboratorio.", style="solid"];
+  "flow_2:n9" [label="flow_2:n9\\n*Dos lecturas de PAS >140 mmHg y/o PAD >90 mmHg tomadas con al menos 4 horas de diferencia.", style="dashed"];
+  "flow_2:n2" -> "flow_2:n1" [label="No"];
+  "flow_2:n2" -> "flow_2:n3" [label="Sí"];
+  "flow_2:n3" -> "flow_2:n4" [label=""];
+  "flow_2:n4" -> "flow_2:n5" [label="Sin criterios"];
+  "flow_2:n4" -> "flow_2:n6" [label="Con criterios"];
+  "flow_2:n5" -> "flow_2:n7" [label=""];
+  "flow_2:n6" -> "flow_2:n8" [label=""];
+}

@@ -1,0 +1,18 @@
+{
+  "book_title": "Introduction to Algorithms",
+  "chapter_number": 25,
+  "chapter_title": "Matchings in Bipartite Graphs",
+  "edition": "Fourth Edition (2022)",
+  "publisher": "MIT Press",
+  "ebook_isbn": "9780262367509",
+  "print_isbn": "9780262046305",
+  "start_page_print": 704,
+  "end_page_print": 743,
+  "start_page_pdf": 911,
+  "end_page_pdf": 963,
+  "pagination_note": "El archivo es una remaquetación Calibre; se registran páginas impresas y páginas físicas del PDF.",
+  "sha256": "76c37e38a15e938dcff6a027aed03f09418423074b1a9ccdda027ba71a5d61a4",
+  "file_size_bytes": 22057568,
+  "verification_status": "verified",
+  "verified_at": "2026-07-15T13:49:08-05:00"
+}

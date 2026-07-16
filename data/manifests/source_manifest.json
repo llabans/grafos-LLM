@@ -1,0 +1,25 @@
+{
+  "source_id": "gpc-05-hipertension-embarazo-2025",
+  "verification_status": "verified",
+  "verified_at": "2026-07-15T13:49:08-05:00",
+  "files": [
+    {"path": "snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/flowcharts.json", "size_bytes": 8890, "sha256": "1319d7aa0313dbb409933456dbccb0fa48f94efbb393b2ba7a5308f7aec50391"},
+    {"path": "snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/recommendations.json", "size_bytes": 5491, "sha256": "469efa9ad85df87ec4b683b2f07a19a0eaba88ee5820ac8783d5ea930d9a1138"},
+    {"path": "snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/tables.json", "size_bytes": 1629927, "sha256": "3fb3a830d7c2eed4276743212f997f380928a16d976b3fa30acba475f0e2abf5"},
+    {"path": "snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/structure.json", "size_bytes": 363758, "sha256": "07c13e216bae5813e5b35d90f876e12ed1b331c2e719e5b99db380d6001e3062"},
+    {"path": "snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/bibliografia.json", "size_bytes": 15374, "sha256": "72d53f3a0024c69f0384282abe5e1efb8789d2de094b85f6567bbf4826c14a44"},
+    {"path": "outputs/phase4/decision_graphs.jsonl", "size_bytes": 115525, "sha256": "a3aee2ddf642cd20786eca59f1d685ea2cbf0c8e2ace4c8b56152c2e21860201"},
+    {"path": "outputs/phase4/semantic_segments.jsonl", "size_bytes": 1774653, "sha256": "463cdc490e88f879a17086225bebfba1a22695bbd62d1fc3f4c9bbb4621f93a7"},
+    {"path": "outputs/phase4/clinical_knowledge_units.jsonl", "size_bytes": 1037626, "sha256": "dedb5a0fdec29b61bfeae53dec4100b668adbf7c9b5546844a7ad8da3130c9b0"}
+  ],
+  "observed_counts": {
+    "recommendations": 5,
+    "tables": 221,
+    "flowcharts": 3,
+    "semantic_segments_phase4": 30,
+    "clinical_knowledge_units_phase4": 269,
+    "decision_graphs_phase4": 3
+  },
+  "source_drift": false
+}
+
