@@ -1,127 +1,141 @@
-# Emparejamiento bipartito MINSA
+# Siete casos, ocho objetivos
 
-Proyecto final de algoritmos sobre **matching máximo en grafos bipartitos**, aplicado a la cobertura y auditoría educativa de datos estructurados derivados de una única GPC:
+Versión KISS del proyecto final de algoritmos. Aplica **matching máximo en grafos
+bipartitos** a una pregunta de diseño educativo derivada de una sola guía:
 
 ```text
 gpc-05-hipertension-embarazo-2025
 ```
 
-El proyecto no diagnostica, recomienda tratamientos ni asigna pacientes. Los términos de la guía se procesan como evidencia estructurada para estudiar algoritmos.
+## Pregunta de investigación
 
-## Idea central
+> ¿Cómo asignar, uno a uno, escenarios clínico-educativos simulados compatibles
+> a microobjetivos de aprendizaje sobre severidad para maximizar el número de
+> microobjetivos cubiertos, sin reutilizar casos?
 
-Se distinguen dos capas:
+Versión oral: **tenemos siete casos y ocho objetivos; ¿cómo emparejarlos para
+cubrir tantos objetivos diferentes como sea posible, usando cada caso una sola
+vez?**
 
-1. `D=(N,A)`: grafo dirigido que conserva decisiones, ramas y acciones de los flujogramas.
-2. `B=(U,V,E)`: grafo bipartito donde `U` son escenarios simbólicos, `V` obligaciones de cobertura y `E` compatibilidades demostrables.
+## El árbol que presentamos
 
-El solver maximiza `|M|` con la restricción de que cada escenario y objetivo aparecen, como máximo, una vez. No resuelve *set cover* ni matching causal/epidemiológico.
-
-## Resultado principal
-
-```text
-PASS |U|=75 |V|=35 |E|=267 |M|=33 coverage=94.29%
-```
-
-Los dos objetivos no cubiertos obedecen a mecanismos distintos:
-
-- un objetivo aislado, sin compatibilidad demostrable (`|S|=1>|N(S)|=0`);
-- un cuello de capacidad: ocho objetivos compiten por siete escenarios (`8>7`).
-
-Los testigos de Hall dan la cota `|M|≤33`; el solver construye 33 pares. Por tanto, la optimalidad del demo queda certificada además de verificada con dos implementaciones propias y NetworkX.
-
-## Goal y LOOP
-
-**Goal:** máxima cobertura educativa uno-a-uno con evidencia reconstruible y cero decisiones clínicas.
+El subgrafo KISS tiene:
 
 ```text
-INSPECT → PLAN → IMPLEMENT → VERIFY → EVIDENCE AUDIT → REVIEW → RECORD
+|U| = 7 casos simbólicos
+|V| = 8 microobjetivos
+|E| = 14 compatibilidades
+|M*| = 7 pares
 ```
 
-Cada ciclo cierra un corte vertical y solo avanza si sus gates están verdes.
+Cada caso representa uno de los siete criterios explícitos de severidad. Se
+conecta con dos objetivos: reconocer su criterio específico y reconocer la
+ruta/BPC común asociada a la presencia de severidad. Como un matching no puede
+reutilizar vértices, siete casos solo pueden acreditar siete objetivos.
 
-## Instalación
+El testigo de Hall lo resume:
+
+```text
+|S| = 8 objetivos > |N(S)| = 7 casos compatibles
+```
+
+No es un error del algoritmo. Es una brecha de capacidad bajo la regla uno-a-uno.
+
+## Qué significa “cubrir”
+
+“Cubrir un microobjetivo” significa asignarle un caso compatible como
+**representante principal**. No significa que:
+
+- el estudiante haya aprendido;
+- el caso sea clínicamente validado;
+- un caso real solo pueda enseñar un objetivo;
+- la cobertura sea sensibilidad, exactitud o beneficio clínico.
+
+La unicidad es útil para construir un banco de fichas, estaciones o actividades
+independientes sin doble conteo. Si un caso pudiera acreditar simultáneamente
+varios objetivos, el modelo apropiado sería cobertura, *set cover* o
+`b`-matching, no matching uno-a-uno.
+
+## Ejecutar el demo autónomo
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
+python scripts/run_kiss_severity_case.py
 ```
 
-Solo la biblioteca estándar es necesaria en ejecución. `pytest`, `ruff`, `mypy` y `networkx` son dependencias de desarrollo; NetworkX se usa exclusivamente como oráculo de pruebas.
-
-## Configuración de la fuente local
-
-No copie el ZIP clínico al repositorio. Descomprímalo fuera del árbol Git y exporte la raíz:
-
-```bash
-export BIPARTITE_MINSA_SOURCE_ROOT=/ruta/a/integration_design_data
-```
-
-La ruta debe contener:
+Salida esperada:
 
 ```text
-snapshots/gpc_json/gpc-05-hipertension-embarazo-2025/
-outputs/phase4/
+PASS |U|=7 |V|=8 |E|=14 |M*|=7
+agreement dfs=7 hopcroft_karp=7
+hall_witness |S|=8 |N(S)|=7 deficiency=1
 ```
 
-Verifique el manifiesto antes de ejecutar:
+El demo no necesita el ZIP privado. El pipeline completo permanece disponible
+como anexo técnico y puede reproducirse configurando
+`BIPARTITE_MINSA_SOURCE_ROOT`.
 
-```bash
-python scripts/validate_sources.py --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
+## Base algorítmica
+
+La fuente curricular principal es el capítulo 25 de *Introduction to
+Algorithms*, 4.ª edición (Cormen, Leiserson, Rivest y Stein, 2022). El proyecto
+implementa desde cero:
+
+- búsqueda por caminos aumentantes;
+- Hopcroft-Karp con BFS por capas y DFS admisible;
+- certificado de déficit de Hall;
+- pruebas de invariantes, optimalidad y casos límite.
+
+La cota clásica de Hopcroft-Karp es `O(E√V)`; el almacenamiento es `O(V+E)`.
+
+## Estado científico, expresado sin exageración
+
+El trabajo está:
+
+- **validado algorítmicamente** mediante dos solvers propios, oráculos y pruebas;
+- **fundamentado científicamente** por literatura sobre guías computables,
+  grafos de guías y simulación clínica educativa;
+- **pendiente de validación clínica de contenido y validación educativa** con
+  expertos y estudiantes.
+
+La revisión realizada no identificó, dentro de su alcance documentado, un
+trabajo que una exactamente: GPC estructurada → escenarios trazables → grafo
+bipartito caso-objetivo → matching máximo y testigo de Hall. Por eso la
+contribución se presenta como una **combinación potencialmente novedosa**, no
+como una prioridad universal demostrada.
+
+## Entregables KISS
+
+- `src/bipartite_minsa/kiss_case.py`: subgrafo autónomo.
+- `tests/test_kiss_severity_case.py`: prueba explícita `7-8-14-7`.
+- `data/samples/kiss_severity_graph.json`: artefacto pequeño y auditable.
+- `notebooks/research_var_cases_kiss.ipynb`: Colab de la exposición.
+- `docs/kiss_project_report.md`: informe principal.
+- `docs/kiss_student_explanation.md`: explicación conceptual detallada.
+- `docs/kiss_academic_validation.md`: validez y límites de las afirmaciones.
+- `docs/literature_review.md`: mapa de literatura y brecha.
+- `docs/validation_protocol.md`: protocolo para la siguiente fase empírica.
+- `output/pdf/material_extra_KISS_research_var_cases.pdf`: ficha visual de una página.
+- `scripts/build_kiss_handout.py`: generador reproducible de la ficha PDF.
+- `outputs/proyecto_final_KISS_research_var_cases.pptx`: presentación.
+
+El “bosque” técnico original —75 escenarios, 35 objetivos, 267 aristas y matching
+33— se conserva en `docs/technical_appendix.md` y en la documentación original.
+
+## GOAL y LOOP
+
+**GOAL:** maximizar microobjetivos distintos representados por casos distintos,
+con compatibilidad trazable y cero decisiones clínicas.
+
+```text
+DEFINIR → CONSTRUIR → RESOLVER → VERIFICAR → INTERPRETAR → REPETIR
 ```
 
-## Ejecución reproducible
+## Límite de seguridad
 
-```bash
-python -m bipartite_minsa.cli run \
-  --source-root "$BIPARTITE_MINSA_SOURCE_ROOT" \
-  --output-dir reports/runtime \
-  --algorithm hopcroft-karp
-```
-
-Etapas equivalentes:
-
-```bash
-python -m bipartite_minsa.pipeline.ingest --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-python -m bipartite_minsa.pipeline.integrate --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-python -m bipartite_minsa.pipeline.build_bipartite_graph --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-python -m bipartite_minsa.pipeline.run_matching --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-```
-
-Las salidas son deterministas y ordenadas. Cada entidad conserva archivo, ID, página/sección y SHA-256.
-
-## Calidad y pruebas
-
-```bash
-ruff format --check .
-ruff check .
-mypy src tests scripts
-pytest -q
-python scripts/validate_project.py --source-root "$BIPARTITE_MINSA_SOURCE_ROOT"
-```
-
-Las 29 pruebas cubren grafos vacíos, perfectos, no perfectos, desconectados, desbalanceados, con aislados, múltiples óptimos, endpoints inválidos, particiones solapadas y los 689 grafos etiquetados con particiones de tamaño 0 a 3. DFS y Hopcroft--Karp concuerdan con enumeración exhaustiva y NetworkX en cardinalidad; el oráculo no exige los mismos pares cuando existen óptimos múltiples.
-
-Benchmarks reproducibles:
-
-```bash
-python scripts/run_benchmarks.py \
-  --source-root "$BIPARTITE_MINSA_SOURCE_ROOT" \
-  --output reports/benchmarks.json --repeats 21
-```
-
-## Material del curso
-
-- `notebooks/emparejamiento_bipartito_minsa.ipynb`: notebook compatible con Colab.
-- `docs/chapter_25_study_notes.md`: lectura técnica del capítulo 25 de CLRS.
-- `docs/academic_validation.md`: validación académica y científica.
-- `docs/student_explanation.md`: explicación para ingeniería estadística con base médica/epidemiológica.
-- `docs/project_report.md`: informe integral del proyecto.
-- `docs/evidence_matrix.csv`: afirmación → fuente → estado → limitación.
-- `outputs/proyecto_final_emparejamiento_bipartito_minsa.pptx`: presentación final.
-- `outputs/material_extra_emparejamiento_bipartito.pdf`: ficha de una página.
-
-## Limitaciones
-
-El resultado mide cobertura estructural dentro de una fuente local y un conjunto de reglas explícitas. No mide validez clínica, efectividad, causalidad, importancia médica ni generalización a otras guías. Una ausencia de arista significa “compatibilidad no demostrada bajo estas reglas”, no “conducta incorrecta”.
+Este repositorio no diagnostica, recomienda tratamientos, prioriza pacientes ni
+evalúa resultados clínicos. Los casos son escenarios simbólicos para educación y
+algoritmos. Una arista significa “compatibilidad demostrada bajo reglas
+declaradas”; no significa “conducta médica correcta”.

@@ -1,0 +1,7 @@
+reviewer_id,unit_type,unit_id,domain,rating_1_to_4,approve_binary,comment
+REPLACE_ME,case,case:severity:01,guideline_fidelity,,,
+REPLACE_ME,case,case:severity:01,clinical_coherence,,,
+REPLACE_ME,case,case:severity:01,educational_relevance,,,
+REPLACE_ME,case,case:severity:01,clarity,,,
+REPLACE_ME,edge,case:severity:01->objective:severity:01,compatibility_sufficiency,,,
+REPLACE_ME,edge,case:severity:01->objective:bpc:severe_path,compatibility_sufficiency,,,

@@ -1,0 +1,44 @@
+{
+  "scope": "educational_non_clinical",
+  "source_id": "gpc-05-hipertension-embarazo-2025",
+  "case_study": "severity_criteria_and_associated_bpc",
+  "question": "¿Cómo asignar, uno a uno, escenarios clínico-educativos simulados compatibles a microobjetivos sobre severidad para maximizar los objetivos cubiertos, sin reutilizar casos?",
+  "left": [
+    {"id": "case:severity:01", "label": "Presión arterial en rango de severidad"},
+    {"id": "case:severity:02", "label": "Trombocitopenia"},
+    {"id": "case:severity:03", "label": "Deterioro de la función hepática"},
+    {"id": "case:severity:04", "label": "Lesión renal aguda u oliguria"},
+    {"id": "case:severity:05", "label": "Edema pulmonar"},
+    {"id": "case:severity:06", "label": "Trastorno cerebral o visual"},
+    {"id": "case:severity:07", "label": "Disfunción útero-placentaria"}
+  ],
+  "right": [
+    {"id": "objective:severity:01", "label": "Identificar el criterio de severidad 1"},
+    {"id": "objective:severity:02", "label": "Identificar el criterio de severidad 2"},
+    {"id": "objective:severity:03", "label": "Identificar el criterio de severidad 3"},
+    {"id": "objective:severity:04", "label": "Identificar el criterio de severidad 4"},
+    {"id": "objective:severity:05", "label": "Identificar el criterio de severidad 5"},
+    {"id": "objective:severity:06", "label": "Identificar el criterio de severidad 6"},
+    {"id": "objective:severity:07", "label": "Identificar el criterio de severidad 7"},
+    {"id": "objective:bpc:severe_path", "label": "Reconocer la ruta/BPC asociada a la presencia de severidad"}
+  ],
+  "edges": [
+    ["case:severity:01", "objective:severity:01"],
+    ["case:severity:01", "objective:bpc:severe_path"],
+    ["case:severity:02", "objective:severity:02"],
+    ["case:severity:02", "objective:bpc:severe_path"],
+    ["case:severity:03", "objective:severity:03"],
+    ["case:severity:03", "objective:bpc:severe_path"],
+    ["case:severity:04", "objective:severity:04"],
+    ["case:severity:04", "objective:bpc:severe_path"],
+    ["case:severity:05", "objective:severity:05"],
+    ["case:severity:05", "objective:bpc:severe_path"],
+    ["case:severity:06", "objective:severity:06"],
+    ["case:severity:06", "objective:bpc:severe_path"],
+    ["case:severity:07", "objective:severity:07"],
+    ["case:severity:07", "objective:bpc:severe_path"]
+  ],
+  "edge_rule": "Cada caso se conecta con su criterio específico y con la BPC común de severidad.",
+  "counts": {"left": 7, "right": 8, "edges": 14, "maximum_matching": 7},
+  "interpretation": "Cobertura uno-a-uno de microobjetivos; no es una métrica clínica ni demuestra aprendizaje."
+}

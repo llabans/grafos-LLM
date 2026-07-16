@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "scope": "educational_non_clinical",
+  "graph": {"left_vertices": 7, "right_vertices": 8, "edges": 14},
+  "maximum_matching": {
+    "cardinality": 7,
+    "objective_coverage_percent": 87.5,
+    "solver_agreement": {"augmenting_path_dfs": 7, "hopcroft_karp": 7}
+  },
+  "hall_witness": {
+    "target_count": 8,
+    "neighboring_case_count": 7,
+    "deficiency": 1
+  },
+  "interpretation": "Siete casos distintos pueden representar como máximo siete de ocho microobjetivos bajo asignación uno-a-uno."
+}

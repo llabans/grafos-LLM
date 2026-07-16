@@ -18,6 +18,7 @@ dev = [
   "networkx>=3.2",
   "pytest>=8.0",
   "pytest-cov>=5.0",
+  "reportlab>=4.0",
   "ruff>=0.5",
 ]
 
@@ -55,4 +56,3 @@ testpaths = ["tests"]
 markers = [
   "source: requires the private local GPC snapshot",
 ]
-
