@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/multicover_solution.schema.json",
+  "title": "Reproducible multicover solution or infeasibility result",
+  "type": "object", "additionalProperties": false,
+  "required": ["solution_id", "mode", "solution_status", "selected_family_ids", "requirement_coverage", "gap_requirement_ids", "total_cost", "cost_basis", "marginal_costs", "infeasibility_certificate", "seed", "configuration_sha256", "warnings"],
+  "properties": {
+    "solution_id": {"type": "string", "minLength": 1},
+    "mode": {"enum": ["minimum_cost_multicover", "maximum_coverage_under_budget"]},
+    "solution_status": {"enum": ["optimal", "feasible", "infeasible", "pending_human", "blocked_incomplete_input"]},
+    "selected_family_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "requirement_coverage": {"type": "array", "items": {"$ref": "#/$defs/coverage"}},
+    "gap_requirement_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "total_cost": {"type": ["number", "null"], "minimum": 0},
+    "cost_basis": {"enum": ["observed_human_minutes", "provisional", "pending_human"]},
+    "marginal_costs": {"type": "array", "items": {"$ref": "#/$defs/marginal"}},
+    "infeasibility_certificate": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/certificate"}]},
+    "seed": {"type": "integer"}, "configuration_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "coverage": {"type": "object", "additionalProperties": false, "required": ["requirement_id", "required", "achieved"], "properties": {"requirement_id": {"type": "string", "minLength": 1}, "required": {"type": "integer", "minimum": 1}, "achieved": {"type": "integer", "minimum": 0}}},
+    "marginal": {"type": "object", "additionalProperties": false, "required": ["requirement_id", "additional_multiplicity", "cost"], "properties": {"requirement_id": {"type": "string"}, "additional_multiplicity": {"type": "integer", "minimum": 1}, "cost": {"type": ["number", "null"], "minimum": 0}}},
+    "certificate": {"type": "object", "additionalProperties": false, "required": ["reason_code", "unmet_requirement_ids", "details"], "properties": {"reason_code": {"enum": ["insufficient_verified_edges", "contrast_incomplete", "budget_insufficient", "input_pending_human", "other"]}, "unmet_requirement_ids": {"type": "array", "items": {"type": "string"}}, "details": {"type": "string"}}}
+  }
+}

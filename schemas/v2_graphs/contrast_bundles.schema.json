@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/contrast_bundles.schema.json",
+  "title": "Paired contrast with explicit invariants",
+  "type": "object", "additionalProperties": false,
+  "required": ["contrast_bundle_id", "family_ids", "decisive_variable_ids", "invariant_facts", "requirement_ids", "pair_status", "review_status"],
+  "properties": {
+    "contrast_bundle_id": {"type": "string", "minLength": 1},
+    "family_ids": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "decisive_variable_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "invariant_facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "requirement_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "pair_status": {"enum": ["complete", "incomplete", "conflicting", "pending_human"]},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {"fact": {"type": "object", "additionalProperties": false, "required": ["variable_id", "value"], "properties": {"variable_id": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number", "integer", "boolean", "null"]}}}}
+}

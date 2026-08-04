@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/coverage_requirements.schema.json",
+  "title": "Coverage requirement distinct from semantic atoms",
+  "type": "object", "additionalProperties": false,
+  "required": ["requirement_id", "requirement_type", "description", "priority", "multiplicity", "risk_basis", "required_atom_ids", "forbidden_atom_ids", "independence_rule", "review_status"],
+  "properties": {
+    "requirement_id": {"type": "string", "minLength": 1},
+    "requirement_type": {"enum": ["recommendation_anchor", "algorithm_branch", "boundary", "contrast", "capability", "insufficient_information", "out_of_scope", "uncertainty", "errata_application", "risk_model_selection", "severe_clinical_error_prevention", "pending_human"]},
+    "description": {"type": "string", "minLength": 1}, "priority": {"enum": ["mandatory", "high", "medium", "exploratory"]},
+    "multiplicity": {"type": "integer", "minimum": 1}, "risk_basis": {"type": "string", "minLength": 1},
+    "required_atom_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "forbidden_atom_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "independence_rule": {"type": "string", "minLength": 1},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  }
+}

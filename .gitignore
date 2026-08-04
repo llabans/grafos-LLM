@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.serena/
+.venv/
+venv/
+*.egg-info/
+.env
+.env.*
+!.env.example
+outputs/
+*.log

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/semantic_atoms.schema.json",
+  "title": "Minimal source-verifiable semantic atom",
+  "type": "object", "additionalProperties": false,
+  "required": ["atom_id", "atom_type", "subject_concept_id", "predicate", "object", "polarity", "modality", "logic_expression", "source_assertion_ids", "applies_to_recommendation_ids", "review_status"],
+  "properties": {
+    "atom_id": {"type": "string", "minLength": 1},
+    "atom_type": {"enum": ["population", "eligibility", "exclusion", "condition", "threshold", "action", "prohibited_action", "frequency", "temporality", "modality", "modality_relation", "direction", "strength", "certainty", "justification", "scope", "out_of_scope", "information_requirement", "missing_information_rule", "reference", "version_correction", "other"]},
+    "subject_concept_id": {"type": "string", "minLength": 1}, "predicate": {"type": "string", "minLength": 1},
+    "object": {"$ref": "#/$defs/atomObject"}, "polarity": {"enum": ["positive", "negative"]},
+    "modality": {"enum": ["must", "should", "may", "should_not", "insufficient_evidence", "not_applicable", "pending_human"]},
+    "logic_expression": {"type": ["string", "null"]},
+    "source_assertion_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "applies_to_recommendation_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {
+    "atomObject": {"type": "object", "additionalProperties": false, "properties": {
+      "concept_id": {"type": "string"}, "value": {"type": ["string", "number", "integer", "boolean", "null"]},
+      "unit": {"type": ["string", "null"]}, "role": {"enum": ["additional", "supplemental", "replacement", "unspecified", "pending_human"]},
+      "lower_bound": {"type": ["number", "null"]}, "upper_bound": {"type": ["number", "null"]},
+      "inclusive_lower": {"type": "boolean"}, "inclusive_upper": {"type": "boolean"}
+    }}
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/normalized_decision_graphs.schema.json",
+  "title": "Source, normalized, or executable decision graph",
+  "type": "object", "additionalProperties": false,
+  "required": ["graph_id", "flow_id", "graph_layer", "source_path", "nodes", "edges", "start_node_ids", "terminal_node_ids", "patch_ids", "diagnostics", "review_status"],
+  "properties": {
+    "graph_id": {"type": "string", "minLength": 1}, "flow_id": {"type": "string", "minLength": 1},
+    "graph_layer": {"enum": ["source_graph", "normalized", "executable", "pending_human"]}, "source_path": {"type": "string", "minLength": 1},
+    "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}}, "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+    "start_node_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "terminal_node_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "patch_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {
+    "node": {"type": "object", "additionalProperties": false, "required": ["node_id", "node_type", "label", "source_element_ids", "review_status"], "properties": {"node_id": {"type": "string", "minLength": 1}, "node_type": {"enum": ["start", "decision", "action", "terminal", "annotation", "unknown"]}, "label": {"type": "string"}, "source_element_ids": {"type": "array", "items": {"type": "string"}}, "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}}},
+    "edge": {"type": "object", "additionalProperties": false, "required": ["edge_id", "from_node_id", "to_node_id", "edge_type", "condition_rule_id", "source_element_ids"], "properties": {"edge_id": {"type": "string", "minLength": 1}, "from_node_id": {"type": "string", "minLength": 1}, "to_node_id": {"type": "string", "minLength": 1}, "edge_type": {"enum": ["conditional", "unconditional", "annotation", "unknown"]}, "condition_rule_id": {"type": ["string", "null"]}, "source_element_ids": {"type": "array", "items": {"type": "string"}}}},
+    "diagnostic": {"type": "object", "additionalProperties": false, "required": ["code", "severity", "message", "element_ids", "status"], "properties": {"code": {"type": "string", "minLength": 1}, "severity": {"enum": ["warning", "error", "blocker"]}, "message": {"type": "string", "minLength": 1}, "element_ids": {"type": "array", "items": {"type": "string"}}, "status": {"enum": ["open", "resolved", "pending_human"]}}}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/qa_gold_candidates.schema.json",
+  "title": "QA/gold candidate that may safely remain ungenerated",
+  "type": "object", "additionalProperties": false,
+  "required": ["qa_candidate_id", "vignette_id", "question", "candidate_answer", "expected_behavior", "source_atom_ids", "candidate_status", "review_status"],
+  "properties": {
+    "qa_candidate_id": {"type": "string", "minLength": 1}, "vignette_id": {"type": "string", "minLength": 1},
+    "question": {"type": ["string", "null"]}, "candidate_answer": {"type": ["string", "null"]},
+    "expected_behavior": {"$ref": "#/$defs/behavior"},
+    "source_atom_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "candidate_status": {"enum": ["not_started", "blocked_pending_human", "candidate_pending_review", "approved_by_human", "rejected"]},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {"behavior": {"type": "object", "additionalProperties": false, "properties": {"status": {"enum": ["defined", "pending_human", "blocked"]}, "route_id": {"type": "string"}, "action_concept_ids": {"type": "array", "items": {"type": "string"}}, "request_variable_ids": {"type": "array", "items": {"type": "string"}}, "abstain": {"type": "boolean"}}}}
+}

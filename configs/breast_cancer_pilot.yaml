@@ -1,0 +1,86 @@
+project:
+  name: integration_design_grafos
+  version: v2
+  root: ".."
+  output_root: "../outputs/breast_cancer_pilot"
+
+data_contract:
+  observation_units:
+    source_manifest_record: one_regular_source_file
+    run_manifest: one_pipeline_run
+    normalized_assertions: one_versioned_source_assertion
+    concept_lexicon_v2: one_auditable_surface_to_concept_mapping
+    variable_dictionary: one_canonical_variable_definition
+    semantic_atoms: one_minimal_source_verifiable_atom
+    executable_rules: one_executable_rule
+    normalized_decision_graphs: one_graph_layer_for_one_source_flow
+    graph_normalization_patches: one_auditable_graph_change
+    coverage_requirements: one_independent_coverage_requirement
+    clinical_families: one_decisionally_independent_family
+    contrast_bundles: one_paired_family_contrast
+    coverage_edges: one_witness_backed_family_requirement_edge
+    multicover_solution: one_optimizer_run_result
+    structured_vignettes: one_structured_vignette_candidate
+    qa_gold_candidates: one_qa_or_gold_candidate
+    human_review_log: one_human_review_event
+  primary_keys:
+    source_manifest_record: relative_path
+    run_manifest: run_id
+    normalized_assertions: assertion_id
+    concept_lexicon_v2: lexicon_entry_id
+    variable_dictionary: variable_id
+    semantic_atoms: atom_id
+    executable_rules: rule_id
+    normalized_decision_graphs: graph_id
+    graph_normalization_patches: patch_id
+    coverage_requirements: requirement_id
+    clinical_families: family_id
+    contrast_bundles: contrast_bundle_id
+    coverage_edges: edge_id
+    multicover_solution: solution_id
+    structured_vignettes: vignette_id
+    qa_gold_candidates: qa_candidate_id
+    human_review_log: review_id
+  foreign_keys:
+    semantic_atoms.source_assertion_ids: normalized_assertions.assertion_id
+    executable_rules.source_atom_ids: semantic_atoms.atom_id
+    coverage_requirements.required_atom_ids: semantic_atoms.atom_id
+    clinical_families.covers_requirement_ids: coverage_requirements.requirement_id
+    contrast_bundles.family_ids: clinical_families.family_id
+    coverage_edges.family_id: clinical_families.family_id
+    coverage_edges.requirement_id: coverage_requirements.requirement_id
+    coverage_edges.source_atom_ids: semantic_atoms.atom_id
+    structured_vignettes.family_id: clinical_families.family_id
+    qa_gold_candidates.vignette_id: structured_vignettes.vignette_id
+
+protected_sources:
+  - id: integration_design_data
+    path: "../../integration_design_data"
+    access: read_only
+  - id: aumento_de_datos
+    path: "../../aumento-de-datos"
+    access: read_only
+  - id: gpc_minsa_benchmark_pack
+    path: "../../gpc_minsa_benchmark_pack/gpc_minsa_benchmark_pack"
+    access: read_only
+  - id: data_escenario
+    path: "../../data_escenario"
+    access: read_only
+
+pilot_snapshots:
+  canonical: "../../integration_design_data/snapshots/gpc_json/gpc-01-mama-2024"
+  errata: "../../integration_design_data/snapshots/gpc_json/gpc-01-mama-fe-erratas-2024"
+  summary_variant: "../../integration_design_data/snapshots/gpc_json/gpc-01-mama-resumida-2024"
+
+material_gaps:
+  - material: breast_gpc_atomization_design_v0_1.json
+    status: absent
+    consequence: methodological_reference_unavailable
+  - material: breast_gpc_candidate_families_v0_1.csv
+    status: absent
+    consequence: methodological_reference_unavailable
+
+serialization:
+  encoding: utf-8
+  deterministic: true
+  jsonl_source_of_truth: true
