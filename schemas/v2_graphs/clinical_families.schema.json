@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/clinical_families.schema.json",
+  "title": "Decisionally independent clinical family",
+  "type": "object", "additionalProperties": false,
+  "required": ["family_id", "family_type", "source_recommendation_ids", "required_facts", "unknown_facts", "forbidden_facts", "target_route_id", "expected_behavior", "must_do", "must_not_do", "covers_requirement_ids", "structural_fingerprint", "estimated_review_minutes", "review_status"],
+  "properties": {
+    "family_id": {"type": "string", "minLength": 1},
+    "family_type": {"enum": ["anchor", "boundary", "contrast", "missingness", "scope", "risk_model", "pathway", "provenance"]},
+    "source_recommendation_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "unknown_facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "forbidden_facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "target_route_id": {"type": "string", "minLength": 1},
+    "expected_behavior": {"$ref": "#/$defs/behavior"},
+    "must_do": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "must_not_do": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "covers_requirement_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "structural_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "estimated_review_minutes": {"type": ["number", "null"], "minimum": 0},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {
+    "fact": {"type": "object", "additionalProperties": false, "required": ["variable_id", "value"], "properties": {"variable_id": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number", "integer", "boolean", "null"]}}},
+    "behavior": {"type": "object", "additionalProperties": false, "properties": {"status": {"enum": ["defined", "pending_human", "blocked"]}, "route_id": {"type": "string"}, "action_concept_ids": {"type": "array", "items": {"type": "string"}}, "request_variable_ids": {"type": "array", "items": {"type": "string"}}, "abstain": {"type": "boolean"}}}
+  }
+}

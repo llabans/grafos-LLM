@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/concept_lexicon_v2.schema.json",
+  "title": "Auditable concept lexicon entry",
+  "type": "object", "additionalProperties": false,
+  "required": ["lexicon_entry_id", "surface_form", "normalized_surface_form", "language", "concept_id", "canonical_label", "mapping_type", "context_constraints", "negation_sensitive", "source_assertion_ids", "review_status"],
+  "properties": {
+    "lexicon_entry_id": {"type": "string", "minLength": 1}, "surface_form": {"type": "string", "minLength": 1},
+    "normalized_surface_form": {"type": "string", "minLength": 1}, "language": {"const": "es"},
+    "concept_id": {"type": "string", "minLength": 1}, "canonical_label": {"type": "string", "minLength": 1},
+    "mapping_type": {"enum": ["source_term", "validated_equivalent", "broader", "narrower", "ambiguous", "do_not_map"]},
+    "context_constraints": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "negation_sensitive": {"type": "boolean"},
+    "source_assertion_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  }
+}

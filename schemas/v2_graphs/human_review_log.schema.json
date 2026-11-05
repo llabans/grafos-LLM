@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/human_review_log.schema.json",
+  "title": "Human review decision event",
+  "type": "object", "additionalProperties": false,
+  "required": ["review_id", "object_type", "object_id", "reviewer_id", "decision", "comments", "evidence_refs", "reviewed_at"],
+  "properties": {
+    "review_id": {"type": "string", "minLength": 1},
+    "object_type": {"enum": ["normalized_assertion", "lexicon_entry", "variable", "semantic_atom", "executable_rule", "decision_graph", "graph_patch", "coverage_requirement", "clinical_family", "contrast_bundle", "coverage_edge", "multicover_solution", "vignette", "qa_candidate", "other"]},
+    "object_id": {"type": "string", "minLength": 1}, "reviewer_id": {"type": ["string", "null"]},
+    "decision": {"enum": ["pending_human", "approved_by_human", "rejected", "needs_changes"]},
+    "comments": {"type": "array", "items": {"type": "string"}}, "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "reviewed_at": {"type": ["string", "null"], "format": "date-time"}
+  }
+}

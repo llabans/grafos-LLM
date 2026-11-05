@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/structured_vignettes.schema.json",
+  "title": "Structured vignette candidate; generation may remain blocked",
+  "type": "object", "additionalProperties": false,
+  "required": ["vignette_id", "family_id", "structural_fingerprint", "variables", "rendered_text", "split", "generation_status", "source_atom_ids", "review_status"],
+  "properties": {
+    "vignette_id": {"type": "string", "minLength": 1}, "family_id": {"type": "string", "minLength": 1},
+    "structural_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "variables": {"type": "array", "items": {"$ref": "#/$defs/variableState"}},
+    "rendered_text": {"type": ["string", "null"]},
+    "split": {"enum": ["train", "dev_visible", "test_visible", "test_hidden", "canary", "retired", "unassigned"]},
+    "generation_status": {"enum": ["not_started", "blocked_pending_human", "generated_pending_review", "approved_by_human", "rejected"]},
+    "source_atom_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "review_status": {"enum": ["pending_human", "approved_by_human", "rejected"]}
+  },
+  "$defs": {
+    "variableState": {"type": "object", "additionalProperties": false, "required": ["variable_id", "value", "value_type", "unit", "knowledge_status", "assertion_status", "source_status", "source_assertion_ids"], "properties": {
+      "variable_id": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number", "integer", "boolean", "null"]},
+      "value_type": {"enum": ["boolean", "integer", "number", "categorical", "string", "date"]}, "unit": {"type": ["string", "null"]},
+      "knowledge_status": {"enum": ["known", "unknown", "conflicting", "not_applicable", "not_performed"]},
+      "assertion_status": {"enum": ["present", "absent", "not_asserted"]},
+      "source_status": {"enum": ["source_supported", "scenario_defined", "human_adjudicated", "pending_human"]},
+      "source_assertion_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+    }}
+  }
+}

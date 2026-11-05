@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/coverage_edges.schema.json",
+  "title": "Witness-backed family-to-requirement edge",
+  "type": "object", "additionalProperties": false,
+  "required": ["edge_id", "family_id", "requirement_id", "coverage_type", "witness_facts", "expected_behavior", "source_atom_ids", "verification_status"],
+  "properties": {
+    "edge_id": {"type": "string", "minLength": 1}, "family_id": {"type": "string", "minLength": 1},
+    "requirement_id": {"type": "string", "minLength": 1},
+    "coverage_type": {"enum": ["direct", "contrast_side", "capability", "negative_control"]},
+    "witness_facts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/fact"}},
+    "expected_behavior": {"$ref": "#/$defs/behavior"},
+    "source_atom_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "verification_status": {"enum": ["pending_human", "verified", "rejected"]}
+  },
+  "$defs": {
+    "fact": {"type": "object", "additionalProperties": false, "required": ["variable_id", "value"], "properties": {"variable_id": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number", "integer", "boolean", "null"]}}},
+    "behavior": {"type": "object", "additionalProperties": false, "properties": {"status": {"enum": ["defined", "pending_human", "blocked"]}, "route_id": {"type": "string"}, "action_concept_ids": {"type": "array", "items": {"type": "string"}}, "request_variable_ids": {"type": "array", "items": {"type": "string"}}, "abstain": {"type": "boolean"}}}
+  }
+}
