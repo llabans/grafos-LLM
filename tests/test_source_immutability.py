@@ -142,3 +142,4 @@ def test_run_manifest_rejects_unstructured_validation_failures():
             warnings=[],
             output_paths=[],
         )
+
