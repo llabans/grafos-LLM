@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "scope": "educational_non_clinical",
+  "source_id": "gpc-05-hipertension-embarazo-2025",
+  "graph": {
+    "left_vertices": 75,
+    "right_vertices": 35,
+    "edges": 267,
+    "density": 0.10171428571428572,
+    "connected_components_including_isolates": 6,
+    "isolated_left": [],
+    "isolated_right": [
+      "target:recommendation:rec_3_not_explicit"
+    ]
+  },
+  "maximum_matching": {
+    "cardinality": 33,
+    "target_coverage_percent": 94.28571428571429,
+    "unused_scenarios": 42,
+    "uncovered_targets": 2,
+    "cardinality_agreement": {
+      "augmenting_path_dfs": 33,
+      "hopcroft_karp": 33,
+      "networkx_oracle": 33
+    }
+  },
+  "hall_witnesses": [
+    {
+      "mechanism": "isolated_evidence_gap",
+      "target_count": 1,
+      "neighboring_scenario_count": 0,
+      "deficiency": 1
+    },
+    {
+      "mechanism": "capacity_bottleneck",
+      "target_count": 8,
+      "neighboring_scenario_count": 7,
+      "deficiency": 1
+    }
+  ],
+  "compatibility": {
+    "candidate_pairs": 2625,
+    "supported": 267,
+    "rejected": 2358
+  },
+  "verification": {
+    "tests_passed": 29,
+    "exhaustive_small_graphs": 689,
+    "lint": "PASS",
+    "types": "PASS",
+    "presentation_overflow_test": "PASS",
+    "presentation_slides_inspected_full_size": 10,
+    "presentation_speaker_notes": 10,
+    "notebook_code_cells_smoke_tested": 15,
+    "handout_pages": 1
+  },
+  "interpretation": "Coverage is one-to-one structural target coverage, not a clinical, predictive, causal, or population metric."
+}

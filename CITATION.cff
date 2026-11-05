@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "Si utiliza este proyecto educativo, cite este repositorio y las fuentes metodológicas indicadas."
+title: "Emparejamiento bipartito para cobertura auditable de una GPC MINSA"
+type: software
+version: 0.1.0
+date-released: 2026-07-15
+authors:
+  - name: Daco
+license: MIT
+repository-code: "https://github.com/llabans/grafos-LLM"
+keywords:
+  - bipartite matching
+  - Hopcroft-Karp
+  - reproducibility
+  - provenance
+  - educational algorithms
+

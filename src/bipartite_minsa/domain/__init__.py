@@ -1,0 +1,1 @@
+"""Modelos canónicos inmutables."""
