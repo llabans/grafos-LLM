@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/run_manifest_v2.schema.json",
+  "title": "V2 pipeline run manifest",
+  "type": "object", "additionalProperties": false,
+  "required": ["run_id", "pipeline_version", "started_at", "status", "source_manifests", "input_counts", "output_counts", "dropped_counts", "validation_failures", "warnings", "output_paths"],
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1}, "pipeline_version": {"type": "string", "minLength": 1},
+    "started_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["running", "completed", "completed_with_warnings", "failed_validation", "blocked"]},
+    "source_manifests": {"type": "object", "additionalProperties": {"type": "array", "items": {"$ref": "#/$defs/fileRecord"}}},
+    "input_counts": {"$ref": "#/$defs/counts"}, "output_counts": {"$ref": "#/$defs/counts"}, "dropped_counts": {"$ref": "#/$defs/counts"},
+    "validation_failures": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "output_paths": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "fileRecord": {"type": "object", "additionalProperties": false, "required": ["relative_path", "sha256", "bytes"], "properties": {"relative_path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "bytes": {"type": "integer", "minimum": 0}}},
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "diagnostic": {"type": "object", "additionalProperties": false, "required": ["code", "message", "path"], "properties": {"code": {"type": "string", "minLength": 1}, "message": {"type": "string", "minLength": 1}, "path": {"type": "string"}, "line": {"type": ["integer", "null"], "minimum": 1}}}
+  }
+}

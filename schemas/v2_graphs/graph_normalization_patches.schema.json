@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "v2_graphs/graph_normalization_patches.schema.json",
+  "title": "Auditable graph normalization patch",
+  "type": "object", "additionalProperties": false,
+  "required": ["patch_id", "flow_id", "operation", "source_elements", "result_elements", "reason", "evidence", "requires_human_approval", "approval_status"],
+  "properties": {
+    "patch_id": {"type": "string", "minLength": 1}, "flow_id": {"type": "string", "minLength": 1},
+    "operation": {"enum": ["connect", "disconnect", "replace_edge", "mark_annotation", "remove_operational_cycle", "other"]},
+    "source_elements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "result_elements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "reason": {"type": "string", "minLength": 1}, "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "requires_human_approval": {"type": "boolean"},
+    "approval_status": {"enum": ["pending_human", "approved_by_human", "rejected", "not_required"]}
+  }
+}
