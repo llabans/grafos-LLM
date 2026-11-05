@@ -1,12 +1,28 @@
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.serena/
-.venv/
-venv/
 *.egg-info/
-.env
-.env.*
-!.env.example
-outputs/
-*.log
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.venv-*/
+build/
+dist/
+*.zip
+*.pptx
+!outputs/proyecto_final_emparejamiento_bipartito_minsa.pptx
+!outputs/proyecto_final_KISS_research_var_cases.pptx
+*.pptx.inspect.ndjson
+tmp/
+
+# La fuente clínica local nunca se versiona.
+integration_design_data/
+*.local.json
+
+# Salidas regenerables con posible texto derivado.
+data/interim/*
+data/processed/*
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+reports/runtime/*

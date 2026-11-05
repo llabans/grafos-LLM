@@ -1,0 +1,15 @@
+digraph clinical {
+  rankdir=LR;
+  node [shape=box];
+  "flow_1:n1" [label="flow_1:n1\\n¿Gestante presenta ≥2 factores de riesgo moderado o ≥1 factor de riesgo alto?", style="solid"];
+  "flow_1:n2" [label="flow_1:n2\\nContinuar CPN", style="solid"];
+  "flow_1:n3" [label="flow_1:n3\\nDar AAS", style="solid"];
+  "flow_1:n4" [label="flow_1:n4\\nDar calcio", style="solid"];
+  "flow_1:n5" [label="flow_1:n5\\nInicio: 12 semanas. Fin: 36 semanas o diagnóstico de hipertensión gestacional o preeclampsia. Posología: 100mg vía oral diario", style="solid"];
+  "flow_1:n6" [label="flow_1:n6\\nInicio: 16 semanas. Fin: 36 semanas o diagnóstico de hipertensión gestacional o preeclampsia. Posología: 1250mg vía oral cada 8 horas", style="solid"];
+  "flow_1:n1" -> "flow_1:n2" [label="No"];
+  "flow_1:n1" -> "flow_1:n3" [label="Sí"];
+  "flow_1:n1" -> "flow_1:n4" [label="Sí"];
+  "flow_1:n3" -> "flow_1:n5" [label=""];
+  "flow_1:n4" -> "flow_1:n6" [label=""];
+}

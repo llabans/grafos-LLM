@@ -1,0 +1,106 @@
+{
+  "schema_version": "2.0",
+  "scope": "pre_synthetic_generation",
+  "question": "¿Cómo asignar estructuras de caso clínico candidatas a rutas clínicas completas para maximizar asignaciones válidas uno-a-uno antes de generar casos sintéticos?",
+  "case_structures": [
+    {
+      "case_structure_id": "case_structure:severity_focus:01",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "fb575967bcfced391d7f9ec61e5b55424edd1386e6554d1f0fcba9d36428f936",
+      "focal_predicate": "severity_criterion:01",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false, true], "severity_criterion:02": [false], "severity_criterion:03": [false], "severity_criterion:04": [false], "severity_criterion:05": [false], "severity_criterion:06": [false], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:02",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "6748b0f8ce9b28f5d023322f85181eb58387ece89177416da9a57539074488bb",
+      "focal_predicate": "severity_criterion:02",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false, true], "severity_criterion:03": [false], "severity_criterion:04": [false], "severity_criterion:05": [false], "severity_criterion:06": [false], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:03",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "10ad128c425767b7ed5960a21042edd6b5628e766d5197cf8b36854ba0727cdf",
+      "focal_predicate": "severity_criterion:03",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false], "severity_criterion:03": [false, true], "severity_criterion:04": [false], "severity_criterion:05": [false], "severity_criterion:06": [false], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:04",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "b6e5d8ef01cbf4c5e688ef374a01b0a82879578f7160bd174d0de17e81fa62d9",
+      "focal_predicate": "severity_criterion:04",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false], "severity_criterion:03": [false], "severity_criterion:04": [false, true], "severity_criterion:05": [false], "severity_criterion:06": [false], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:05",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "44006df14b6c2d6b2a3b9ea7b921010b05ad0ae6024a3b207165eb88bf6bbb72",
+      "focal_predicate": "severity_criterion:05",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false], "severity_criterion:03": [false], "severity_criterion:04": [false], "severity_criterion:05": [false, true], "severity_criterion:06": [false], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:06",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "5df7ee1387a47ae5102aa87942af1f5498d6d18b87c239258d41e299bca571a8",
+      "focal_predicate": "severity_criterion:06",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false], "severity_criterion:03": [false], "severity_criterion:04": [false], "severity_criterion:05": [false], "severity_criterion:06": [false, true], "severity_criterion:07": [false]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:07",
+      "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+      "unit_capacity": 1,
+      "canonical_signature": "c0f4ad9667c5dd5da96f69427019338ee75ed15b08ae0c264814a9ef4358e584",
+      "focal_predicate": "severity_criterion:07",
+      "variable_domains": {"bp_elevated": [true], "severity_criterion:01": [false], "severity_criterion:02": [false], "severity_criterion:03": [false], "severity_criterion:04": [false], "severity_criterion:05": [false], "severity_criterion:06": [false], "severity_criterion:07": [false, true]},
+      "allowed_missingness": [],
+      "source_unit_ids": ["flow_2:n4", "bpc_1", "bpc_2"]
+    }
+  ],
+  "clinical_route_variants": [
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:01", "required_predicates": ["bp_elevated", "severity_criterion:01"], "forbidden_predicates": ["severity_criterion:02", "severity_criterion:03", "severity_criterion:04", "severity_criterion:05", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:02", "required_predicates": ["bp_elevated", "severity_criterion:02"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:03", "severity_criterion:04", "severity_criterion:05", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:03", "required_predicates": ["bp_elevated", "severity_criterion:03"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:04", "severity_criterion:05", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:04", "required_predicates": ["bp_elevated", "severity_criterion:04"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:03", "severity_criterion:05", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:05", "required_predicates": ["bp_elevated", "severity_criterion:05"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:03", "severity_criterion:04", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:06", "required_predicates": ["bp_elevated", "severity_criterion:06"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:03", "severity_criterion:04", "severity_criterion:05", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:severity:07", "required_predicates": ["bp_elevated", "severity_criterion:07"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:03", "severity_criterion:04", "severity_criterion:05", "severity_criterion:06"], "decision_node_id": "flow_2:n4", "branch": "severity_present", "terminal_action_id": "flow_2:n8", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"], "source_unit_ids": ["flow_2:n4", "flow_2:n8", "bpc_2"]},
+    {"clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "required_predicates": ["bp_elevated"], "forbidden_predicates": ["severity_criterion:01", "severity_criterion:02", "severity_criterion:03", "severity_criterion:04", "severity_criterion:05", "severity_criterion:06", "severity_criterion:07"], "decision_node_id": "flow_2:n4", "branch": "no_severity", "terminal_action_id": "flow_2:n7", "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n7"], "source_unit_ids": ["flow_2:n4", "flow_2:n7", "bpc_1"]}
+  ],
+  "compatibility_edges": [
+    {"case_structure_id": "case_structure:severity_focus:01", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:01", "reexecution_result": "clinical_route_variant:flow_2:severity:01", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": true, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:01", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:02", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:02", "reexecution_result": "clinical_route_variant:flow_2:severity:02", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": true, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:02", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:03", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:03", "reexecution_result": "clinical_route_variant:flow_2:severity:03", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": true, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:03", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:04", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:04", "reexecution_result": "clinical_route_variant:flow_2:severity:04", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": true, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:04", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:05", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:05", "reexecution_result": "clinical_route_variant:flow_2:severity:05", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": true, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:05", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:06", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:06", "reexecution_result": "clinical_route_variant:flow_2:severity:06", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": true, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:06", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}},
+    {"case_structure_id": "case_structure:severity_focus:07", "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:07", "reexecution_result": "clinical_route_variant:flow_2:severity:07", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": true}},
+    {"case_structure_id": "case_structure:severity_focus:07", "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity", "reexecution_result": "clinical_route_variant:flow_2:no_severity", "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false}}
+  ],
+  "edge_rule": "Existe una arista si y solo si hay una asignación completa x en Inst(u) cuya ejecución determinista produce exactamente la ruta v.",
+  "counts": {"case_structures": 7, "clinical_route_variants": 8, "compatibility_edges": 14, "maximum_matching": 7},
+  "interpretation": "El matching reserva estructuras distintas para rutas distintas; todavía no crea instancias, narrativas ni pacientes sintéticos."
+}

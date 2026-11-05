@@ -1,0 +1,77 @@
+{
+  "gates": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "returncode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "stdout": "58 files already formatted\n"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "returncode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "mypy",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "returncode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "stdout": "Success: no issues found in 58 source files\n"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "returncode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "stdout": ".............................                                            [100%]\n29 passed in 0.66s\n"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "bipartite_minsa.pipeline.run_matching",
+        "--source-root",
+        "$BIPARTITE_MINSA_SOURCE_ROOT",
+        "--output-dir",
+        "reports/runtime"
+      ],
+      "returncode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "stdout": "PASS |U|=75 |V|=35 |E|=267 |M|=33 coverage=94.29%\n"
+    }
+  ],
+  "status": "PASS"
+}

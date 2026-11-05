@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "stage": "pre_synthetic_generation_assignment",
+  "catalog_batch_id": "pilot_catalog:severity_flow_2:v1",
+  "algorithm_reference": "Cormen et al., Introduction to Algorithms, 4e, Chapter 25",
+  "counts": {"case_structures": 7, "clinical_route_variants": 8, "compatibility_edges": 14, "selected_assignments": 7},
+  "selected_assignments": [
+    {
+      "case_structure_id": "case_structure:severity_focus:01",
+      "canonical_signature": "fb575967bcfced391d7f9ec61e5b55424edd1386e6554d1f0fcba9d36428f936",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:no_severity",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n7"],
+      "predicate_signature": ["+bp_elevated", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:03", "-severity_criterion:04", "-severity_criterion:05", "-severity_criterion:06", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:no_severity",
+      "terminal_action_id": "flow_2:n7",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:02",
+      "canonical_signature": "6748b0f8ce9b28f5d023322f85181eb58387ece89177416da9a57539074488bb",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:02",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:02", "-severity_criterion:01", "-severity_criterion:03", "-severity_criterion:04", "-severity_criterion:05", "-severity_criterion:06", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": true, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:02",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:03",
+      "canonical_signature": "10ad128c425767b7ed5960a21042edd6b5628e766d5197cf8b36854ba0727cdf",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:03",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:03", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:04", "-severity_criterion:05", "-severity_criterion:06", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": true, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:03",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:04",
+      "canonical_signature": "b6e5d8ef01cbf4c5e688ef374a01b0a82879578f7160bd174d0de17e81fa62d9",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:04",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:04", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:03", "-severity_criterion:05", "-severity_criterion:06", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": true, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:04",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:05",
+      "canonical_signature": "44006df14b6c2d6b2a3b9ea7b921010b05ad0ae6024a3b207165eb88bf6bbb72",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:05",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:05", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:03", "-severity_criterion:04", "-severity_criterion:06", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": true, "severity_criterion:06": false, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:05",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:06",
+      "canonical_signature": "5df7ee1387a47ae5102aa87942af1f5498d6d18b87c239258d41e299bca571a8",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:06",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:06", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:03", "-severity_criterion:04", "-severity_criterion:05", "-severity_criterion:07"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": true, "severity_criterion:07": false},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:06",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    },
+    {
+      "case_structure_id": "case_structure:severity_focus:07",
+      "canonical_signature": "c0f4ad9667c5dd5da96f69427019338ee75ed15b08ae0c264814a9ef4358e584",
+      "unit_capacity": 1,
+      "clinical_route_variant_id": "clinical_route_variant:flow_2:severity:07",
+      "path_node_ids": ["flow_2:bp_elevated", "flow_2:n4", "flow_2:n8"],
+      "predicate_signature": ["+bp_elevated", "+severity_criterion:07", "-severity_criterion:01", "-severity_criterion:02", "-severity_criterion:03", "-severity_criterion:04", "-severity_criterion:05", "-severity_criterion:06"],
+      "witness_assignment": {"bp_elevated": true, "severity_criterion:01": false, "severity_criterion:02": false, "severity_criterion:03": false, "severity_criterion:04": false, "severity_criterion:05": false, "severity_criterion:06": false, "severity_criterion:07": true},
+      "reexecution_result": "clinical_route_variant:flow_2:severity:07",
+      "terminal_action_id": "flow_2:n8",
+      "source_refs": ["GPC:flow_2", "GPC:severity_criteria"],
+      "validation_status": {"source_traceability": "endpoint_refs_present", "structural_consistency": "witness_found_and_reexecuted", "clinical_content": "pending_expert_review"}
+    }
+  ],
+  "unassigned_clinical_route_variants": ["clinical_route_variant:flow_2:severity:01"],
+  "generation_status": "not_started"
+}
